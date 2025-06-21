@@ -6,7 +6,7 @@ Bu proje, gelişmiş makine öğrenmesi teknikleri ve çoklu analiz motorları k
 
 ## ✨ Özellikler
 
-### 🤖 ML Ensemble (7 Model)
+### 🤖 ML Ensemble (6 Model)
 - **phishing_model**: Genel phishing tespiti
 - **cybersecurity_model**: Siber güvenlik analizi  
 - **phishing_urls_model**: Gelişmiş URL analizi
