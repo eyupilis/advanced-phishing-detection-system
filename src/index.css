@@ -1,0 +1,69 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.safe-url {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.phishing-url {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.analysis-card {
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.feature-chip {
+  margin: 4px;
+  font-size: 0.75rem;
+}
+
+.risk-meter {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.risk-meter-bar {
+  height: 20px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #4caf50 0%, #ffeb3b 50%, #f44336 100%);
+  position: relative;
+  margin: 10px 0;
+}
+
+.risk-indicator {
+  position: absolute;
+  top: -5px;
+  width: 4px;
+  height: 30px;
+  background: #000;
+  border-radius: 2px;
+} 

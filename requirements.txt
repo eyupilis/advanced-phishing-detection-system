@@ -1,0 +1,119 @@
+pandas==2.1.4
+numpy==1.25.2
+scikit-learn==1.3.2
+xgboost==2.0.3
+catboost==1.2.3
+joblib==1.3.2
+requests==2.31.0
+pydantic==2.5.2
+
+# Supabase Integration
+python-dotenv==1.0.0
+
+# Additional dependencies for enhanced functionality
+psycopg2-binary==2.9.9
+
+# Data analysis and visualization
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Logging and monitoring
+python-json-logger==2.0.7
+
+# Security and validation
+validators==0.22.0
+tld==0.13
+
+# Performance and caching
+redis==5.0.1
+
+# Development and testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+lightgbm==4.0.0
+matplotlib==3.7.2
+seaborn==0.12.2
+shap==0.42.1
+flask==2.3.3
+flask-cors==4.0.0
+plotly==5.15.0
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+supabase==1.0.4
+jupyter==1.0.0
+ipykernel==6.25.1
+
+# Enhanced phishing detector dependencies
+aiohttp==3.9.1
+tldextract==5.1.1
+
+# NEW ADVANCED FEATURES DEPENDENCIES
+
+# Content Analysis
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Network Analysis
+dnspython==2.4.2
+geoip2==4.7.0
+
+# Real-time Monitoring
+asyncio-mqtt==0.11.1
+websockets==12.0
+
+# Advanced ML Features
+scipy==1.11.4
+imbalanced-learn==0.11.0
+optuna==3.4.0
+
+# Behavioral Analysis
+python-dateutil==2.8.2
+
+# Security Enhancements
+cryptography==41.0.8
+pyotp==2.9.0
+
+# API Rate Limiting
+slowapi==0.1.9
+
+# Background Tasks
+celery==5.3.4
+redis==5.0.1
+
+# Image Processing (for visual analysis)
+Pillow==10.1.0
+opencv-python==4.8.1.78
+
+# Text Processing
+nltk==3.8.1
+spacy==3.7.2
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.13.1
+
+# Monitoring and Logging
+prometheus-client==0.19.0
+structlog==23.2.0
+
+# Configuration Management
+dynaconf==3.2.4
+
+# HTTP Client Enhancements
+httpx==0.25.2
+
+# UUID and Hashing
+uuid==1.30
+hashlib==20081119
+
+# Time Zone Support
+pytz==2023.3
+
+# Memory Optimization
+memory-profiler==0.61.0
+psutil==5.9.6
+
+# Advanced Statistics
+statsmodels==0.14.0 

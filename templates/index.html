@@ -1,0 +1,2884 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 CYBER THREAT INTELLIGENCE - 7-Model Ensemble System</title>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@6.5.1/dist/framer-motion.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyber-blue: #00ffff;
+            --cyber-green: #00ff41;
+            --cyber-red: #ff073a;
+            --cyber-purple: #a020f0;
+            --cyber-orange: #ff8c00;
+            --dark-bg: #0a0a0a;
+            --matrix-green: #00ff00;
+            --warning-yellow: #ffff00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--dark-bg);
+            color: var(--cyber-blue);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* SPLASH SCREEN - DISABLED */
+        #splash-screen {
+            display: none !important;
+        }
+
+        #splash-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .radar-scanner {
+            width: 300px;
+            height: 300px;
+            border: 2px solid var(--cyber-blue);
+            border-radius: 50%;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        .radar-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cyber-blue), transparent);
+            transform-origin: 0 0;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .boot-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 30px;
+            text-shadow: 0 0 20px var(--cyber-blue);
+            animation: typewriter 3s steps(30);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .skip-hint {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--cyber-green);
+            margin-top: 20px;
+            opacity: 0.7;
+            animation: blink 2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 0.7; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        /* MATRIX BACKGROUND */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* MAIN CONTAINER */
+        .cyber-container {
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HEX GRID OVERLAY */
+        .hex-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 50% 50%, transparent 40%, var(--cyber-blue) 41%, var(--cyber-blue) 42%, transparent 43%),
+                linear-gradient(0deg, transparent 24%, var(--cyber-blue) 25%, var(--cyber-blue) 26%, transparent 27%, transparent 74%, var(--cyber-blue) 75%, var(--cyber-blue) 76%, transparent 77%),
+                linear-gradient(60deg, transparent 24%, var(--cyber-blue) 25%, var(--cyber-blue) 26%, transparent 27%, transparent 74%, var(--cyber-blue) 75%, var(--cyber-blue) 76%, transparent 77%),
+                linear-gradient(-60deg, transparent 24%, var(--cyber-blue) 25%, var(--cyber-blue) 26%, transparent 27%, transparent 74%, var(--cyber-blue) 75%, var(--cyber-blue) 76%, transparent 77%);
+            background-size: 50px 87px;
+            opacity: 0.1;
+            z-index: -1;
+            animation: hex-drift 20s linear infinite;
+        }
+
+        @keyframes hex-drift {
+            from { transform: translateX(0); }
+            to { transform: translateX(50px); }
+        }
+
+        /* HEADER */
+        .cyber-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .cyber-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(24px, 5vw, 48px);
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green), var(--cyber-purple));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--cyber-blue);
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: brightness(1) drop-shadow(0 0 20px var(--cyber-blue)); }
+            to { filter: brightness(1.2) drop-shadow(0 0 40px var(--cyber-blue)); }
+        }
+
+        .cyber-subtitle {
+            font-size: 16px;
+            color: var(--cyber-green);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .model-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .model-badge {
+            background: linear-gradient(45deg, rgba(0,255,255,0.2), rgba(0,255,65,0.2));
+            border: 1px solid var(--cyber-blue);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .model-badge:hover {
+            background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green));
+            color: #000;
+            transform: scale(1.05);
+        }
+
+        /* ANALYSIS PANEL */
+        .analysis-panel {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            background: linear-gradient(135deg, rgba(0,255,255,0.05), rgba(0,255,65,0.05));
+            border: 2px solid var(--cyber-blue);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 50px rgba(0,255,255,0.3);
+        }
+
+        .analysis-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green), var(--cyber-purple), var(--cyber-red));
+            border-radius: 20px;
+            z-index: -1;
+            animation: border-glow 3s linear infinite;
+        }
+
+        @keyframes border-glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .url-input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid var(--cyber-blue);
+            border-radius: 10px;
+            color: var(--cyber-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .url-input:focus {
+            border-color: var(--cyber-green);
+            box-shadow: 0 0 20px rgba(0,255,65,0.5);
+            transform: scale(1.02);
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green));
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,255,255,0.5);
+        }
+
+        .analyze-btn:active {
+            transform: scale(0.98);
+        }
+
+        .analyze-btn.analyzing {
+            background: linear-gradient(45deg, var(--cyber-red), var(--cyber-orange));
+            animation: pulse-btn 1s infinite;
+        }
+
+        @keyframes pulse-btn {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .btn-hologram {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, var(--cyber-blue), transparent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: all 0.6s ease;
+        }
+
+        .btn-hologram.active {
+            width: 200px;
+            height: 200px;
+            opacity: 0.8;
+        }
+
+        /* LOADING EFFECTS */
+        .scan-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                transparent 50%,
+                rgba(0,255,255,0.1) 50%,
+                rgba(0,255,255,0.1) 51%,
+                transparent 51%
+            );
+            background-size: 100% 4px;
+            animation: scan 0.1s linear infinite;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .scan-lines.active {
+            opacity: 1;
+        }
+
+        @keyframes scan {
+            from { transform: translateY(0); }
+            to { transform: translateY(4px); }
+        }
+
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .glitch-overlay.active {
+            opacity: 1;
+            animation: glitch 0.3s ease-in-out 3;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); filter: hue-rotate(0deg); }
+            20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+            40% { transform: translate(-2px, -2px); filter: hue-rotate(180deg); }
+            60% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
+            80% { transform: translate(2px, -2px); filter: hue-rotate(360deg); }
+        }
+
+        /* PACKET FLOW */
+        .packet-flow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+        }
+
+        .packet-flow.active {
+            opacity: 1;
+        }
+
+        .packet {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--cyber-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--cyber-green);
+            animation: packet-move 2s linear infinite;
+        }
+
+        @keyframes packet-move {
+            from { 
+                transform: translateX(-10px) translateY(-10px);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            to { 
+                transform: translateX(100vw) translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* RESULTS SECTION */
+        .results-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .results-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 3D RADAR CHART EFFECT */
+        .radar-chart-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+            perspective: 1000px;
+        }
+
+        .radar-chart {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate-3d 20s linear infinite;
+        }
+
+        .radar-ring {
+            position: absolute;
+            border: 2px solid var(--cyber-blue);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: pulse-ring 3s ease-in-out infinite;
+        }
+
+        .radar-ring:nth-child(1) {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            animation-delay: 0s;
+        }
+
+        .radar-ring:nth-child(2) {
+            width: 75%;
+            height: 75%;
+            top: 12.5%;
+            left: 12.5%;
+            animation-delay: 0.5s;
+        }
+
+        .radar-ring:nth-child(3) {
+            width: 50%;
+            height: 50%;
+            top: 25%;
+            left: 25%;
+            animation-delay: 1s;
+        }
+
+        .radar-ring:nth-child(4) {
+            width: 25%;
+            height: 25%;
+            top: 37.5%;
+            left: 37.5%;
+            animation-delay: 1.5s;
+        }
+
+        .radar-sweep {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cyber-green), transparent);
+            transform-origin: 0 0;
+            animation: radar-sweep 4s linear infinite;
+        }
+
+        .threat-indicator {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--cyber-red);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--cyber-red);
+            animation: threat-blink 1s infinite;
+        }
+
+        .threat-indicator.safe {
+            background: var(--cyber-green);
+            box-shadow: 0 0 20px var(--cyber-green);
+        }
+
+        @keyframes rotate-3d {
+            from { transform: rotateY(0deg) rotateX(10deg); }
+            to { transform: rotateY(360deg) rotateX(10deg); }
+        }
+
+        @keyframes pulse-ring {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        @keyframes radar-sweep {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes threat-blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .threat-level {
+            font-family: 'Orbitron', monospace;
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px currentColor;
+            animation: threat-pulse 2s ease-in-out infinite;
+        }
+
+        .threat-level.safe {
+            color: var(--cyber-green);
+        }
+
+        .threat-level.warning {
+            color: var(--warning-yellow);
+        }
+
+        .threat-level.danger {
+            color: var(--cyber-red);
+        }
+
+        @keyframes threat-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .confidence-meter {
+            width: 300px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid var(--cyber-blue);
+            border-radius: 10px;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyber-red), var(--warning-yellow), var(--cyber-green));
+            border-radius: 8px;
+            transition: width 2s ease;
+            position: relative;
+        }
+
+        .confidence-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            from { left: -100%; }
+            to { left: 100%; }
+        }
+
+        /* VOTING DISPLAY */
+        .voting-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .voting-card {
+            background: linear-gradient(135deg, rgba(0,255,255,0.1), rgba(0,255,65,0.1));
+            border: 1px solid var(--cyber-blue);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .voting-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,255,255,0.3);
+        }
+
+        .voting-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .voting-card:hover::before {
+            left: 100%;
+        }
+
+        /* MODEL RESULTS */
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .model-card {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,255,255,0.1));
+            border: 1px solid var(--cyber-blue);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+            animation: model-appear 0.8s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .model-card:nth-child(odd) {
+            animation-delay: 0.2s;
+        }
+
+        .model-card:nth-child(even) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes model-appear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .model-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .model-name {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            color: var(--cyber-blue);
+        }
+
+        .model-prediction {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .model-prediction.safe {
+            background: var(--cyber-green);
+            color: #000;
+        }
+
+        .model-prediction.phishing {
+            background: var(--cyber-red);
+            color: #fff;
+        }
+
+        .model-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .model-progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1.5s ease;
+            background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-green));
+        }
+
+        .model-progress-fill.phishing {
+            background: linear-gradient(90deg, var(--cyber-red), var(--cyber-orange));
+        }
+
+        /* FEEDBACK SECTION */
+        .feedback-section {
+            background: linear-gradient(135deg, rgba(0,255,255,0.05), rgba(160,32,240,0.05));
+            border: 1px solid var(--cyber-purple);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .feedback-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .feedback-btn {
+            padding: 15px 30px;
+            border: 2px solid;
+            border-radius: 10px;
+            background: transparent;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-btn.correct {
+            border-color: var(--cyber-green);
+            color: var(--cyber-green);
+        }
+
+        .feedback-btn.incorrect {
+            border-color: var(--cyber-red);
+            color: var(--cyber-red);
+        }
+
+        .feedback-btn:hover {
+            background: currentColor;
+            color: #000;
+            transform: scale(1.05);
+        }
+
+        /* COMPREHENSIVE ANALYSIS STYLES */
+        .comprehensive-header {
+            background: linear-gradient(135deg, rgba(0,255,255,0.1), rgba(160,32,240,0.1));
+            border: 2px solid var(--cyber-blue);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .analysis-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .summary-label {
+            color: var(--cyber-blue);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .summary-value {
+            color: var(--cyber-green);
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ANALYSIS PROCESS PANEL */
+        .analysis-process-panel {
+            max-width: 1000px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, rgba(0,255,65,0.05), rgba(0,255,255,0.05));
+            border: 2px solid var(--cyber-green);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0,255,65,0.2);
+        }
+
+        .process-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .process-title {
+            color: var(--cyber-green);
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            margin: 0 0 10px 0;
+        }
+
+        .process-toggle {
+            background: rgba(0,255,65,0.1);
+            border: 1px solid var(--cyber-green);
+            color: var(--cyber-green);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .process-toggle:hover {
+            background: rgba(0,255,65,0.2);
+            transform: scale(1.05);
+        }
+
+        .analysis-steps {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .analysis-step {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 10px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .analysis-step.processing {
+            border-left-color: var(--cyber-blue);
+            animation: step-pulse 1.5s infinite;
+        }
+
+        .analysis-step.completed {
+            border-left-color: var(--cyber-green);
+        }
+
+        .analysis-step.error {
+            border-left-color: var(--cyber-red);
+        }
+
+        .analysis-step.warning {
+            border-left-color: var(--cyber-orange);
+        }
+
+        @keyframes step-pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(0,255,255,0.3); }
+            50% { box-shadow: 0 0 15px rgba(0,255,255,0.6); }
+        }
+
+        .step-icon {
+            font-size: 16px;
+            margin-right: 12px;
+            min-width: 20px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-name {
+            font-weight: 700;
+            color: var(--cyber-green);
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .step-message {
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.3;
+        }
+
+        .step-timing {
+            font-size: 10px;
+            color: var(--cyber-blue);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .step-duration {
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* ENGINES GRID */
+        .engines-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .engine-card {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6));
+            border: 2px solid var(--cyber-blue);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .engine-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,255,255,0.3);
+            border-color: var(--cyber-green);
+        }
+
+        .engine-card h3 {
+            color: var(--cyber-green);
+            font-size: 16px;
+            margin: 0 0 15px 0;
+            font-family: 'Orbitron', monospace;
+            text-align: center;
+        }
+
+        .engine-weight {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(0,255,255,0.2);
+            color: var(--cyber-blue);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .engine-status {
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .engine-status.success { background: rgba(0,255,65,0.2); color: var(--cyber-green); }
+        .engine-status.warning { background: rgba(255,165,0,0.2); color: var(--cyber-orange); }
+        .engine-status.danger { background: rgba(255,0,0,0.2); color: var(--cyber-red); }
+        .engine-status.processing { background: rgba(0,255,255,0.2); color: var(--cyber-blue); animation: pulse 1s infinite; }
+
+        .engine-score {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--cyber-green);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 15px;
+        }
+
+        .engine-details {
+            border-top: 1px solid rgba(0,255,255,0.3);
+            padding-top: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .detail-item span {
+            color: var(--cyber-green);
+            font-weight: 700;
+        }
+
+        /* THREAT INTELLIGENCE DETAILED VIEW */
+        .threat-intel-details {
+            border-top: 1px solid rgba(255,0,128,0.3);
+            padding-top: 15px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .intel-section {
+            margin-bottom: 12px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 4px;
+            border-left: 3px solid var(--cyber-red);
+        }
+
+        .intel-label {
+            font-size: 9px;
+            font-weight: bold;
+            color: var(--cyber-red);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .intel-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 10px;
+            color: var(--cyber-blue);
+        }
+
+        .intel-item span {
+            color: var(--cyber-green);
+            font-weight: 700;
+        }
+
+        /* NETWORK SECURITY DETAILED VIEW */
+        .network-details {
+            border-top: 1px solid rgba(0,255,255,0.3);
+            padding-top: 15px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .network-section {
+            margin-bottom: 12px;
+            padding: 8px;
+            background: rgba(0, 100, 255, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid var(--cyber-blue);
+        }
+
+        .network-label {
+            font-size: 9px;
+            font-weight: bold;
+            color: var(--cyber-blue);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .network-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 10px;
+            color: var(--cyber-blue);
+        }
+
+        .network-item span {
+            color: var(--cyber-green);
+            font-weight: 700;
+        }
+
+        /* CONTENT SECURITY DETAILED VIEW */
+        .content-details {
+            border-top: 1px solid rgba(0,255,255,0.3);
+            padding-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .content-section {
+            margin-bottom: 12px;
+            padding: 8px;
+            background: rgba(255, 100, 0, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid var(--cyber-orange);
+        }
+
+        .content-label {
+            font-size: 9px;
+            font-weight: bold;
+            color: var(--cyber-orange);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .content-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+
+        .content-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            padding: 2px 0;
+        }
+
+        .metric-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 9px;
+        }
+
+        .metric-value {
+            color: var(--cyber-orange);
+            font-weight: 700;
+            font-size: 10px;
+        }
+
+        .detail-more {
+            margin-top: 10px;
+            padding: 6px;
+            background: rgba(0,255,255,0.1);
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 9px;
+            font-weight: bold;
+            color: var(--cyber-blue);
+            text-align: center;
+            border: 1px solid rgba(0,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .detail-more:hover {
+            background: rgba(0,255,255,0.2);
+            border-color: var(--cyber-blue);
+        }
+
+        .detail-header {
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--cyber-orange);
+            text-align: center;
+            padding: 6px;
+            background: rgba(255,100,0,0.1);
+            border-radius: 3px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,100,0,0.3);
+        }
+
+        .more-icon {
+            margin-right: 5px;
+            font-size: 8px;
+        }
+
+        /* ENGINE SPECIFIC COLORS */
+        .ml-engine { border-color: var(--cyber-green); }
+        .threat-intel-engine { border-color: var(--cyber-red); }
+        .network-engine { border-color: var(--cyber-blue); }
+        .content-engine { border-color: var(--cyber-orange); }
+        .behavioral-engine { border-color: var(--cyber-purple); }
+        .visual-engine { border-color: var(--cyber-pink); }
+        .truncation-engine { border-color: var(--cyber-yellow); }
+        .wbl-engine { border-color: var(--cyber-cyan); }
+        .fp-engine { border-color: var(--cyber-lime); }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .cyber-title {
+                font-size: 28px;
+            }
+            
+            .models-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .voting-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .feedback-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* SCROLL INDICATORS */
+        .scroll-indicator {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .scroll-dot {
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--cyber-blue);
+            border-radius: 50%;
+            background: transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .scroll-dot.active {
+            background: var(--cyber-blue);
+            box-shadow: 0 0 15px var(--cyber-blue);
+        }
+    </style>
+</head>
+<body x-data="cyberPhishingDetector()">
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <div class="radar-scanner">
+            <div class="radar-line"></div>
+        </div>
+                    <div class="boot-text">INITIALIZING THREAT DETECTION SYSTEM...</div>
+            <div class="skip-hint">CLICK ANYWHERE OR PRESS SPACE TO SKIP</div>
+            <button onclick="document.getElementById('splash-screen').style.display='none'" 
+                    style="margin-top: 20px; padding: 10px 20px; background: #00ffff; color: #000; border: none; border-radius: 5px; font-family: 'JetBrains Mono', monospace; font-weight: bold; cursor: pointer;">
+                EMERGENCY SKIP
+            </button>
+    </div>
+
+    <!-- Matrix Background -->
+    <canvas id="matrix-canvas"></canvas>
+    
+    <!-- Hex Grid Overlay -->
+    <div class="hex-grid"></div>
+    
+    <!-- Scan Lines Effect -->
+    <div class="scan-lines" :class="{ active: scanning }"></div>
+    
+    <!-- Glitch Overlay -->
+    <div class="glitch-overlay" :class="{ active: glitching }"></div>
+    
+    <!-- Packet Flow -->
+    <div class="packet-flow" :class="{ active: analyzing }"></div>
+
+    <!-- Scroll Indicators -->
+    <div class="scroll-indicator">
+        <div class="scroll-dot active"></div>
+        <div class="scroll-dot"></div>
+        <div class="scroll-dot"></div>
+    </div>
+
+    <div class="cyber-container">
+        <!-- Header -->
+        <header class="cyber-header">
+            <h1 class="cyber-title">CYBER THREAT INTELLIGENCE</h1>
+            <p class="cyber-subtitle">7-Model Ensemble Detection System</p>
+            <div class="model-badges">
+                <span class="model-badge">Mega Phishing</span>
+                <span class="model-badge">Cybersecurity</span>
+                <span class="model-badge">Advanced URL</span>
+                <span class="model-badge">Website</span>
+                <span class="model-badge">Crypto</span>
+                <span class="model-badge">Link Analysis</span>
+                <span class="model-badge">Malicious URLs</span>
+            </div>
+        </header>
+
+        <!-- Analysis Panel -->
+        <div class="analysis-panel">
+            <form @submit.prevent="initiateAnalysis()">
+                <div class="url-input-container">
+                    <input 
+                        type="text" 
+                        x-model="targetUrl"
+                        placeholder="TARGET URL FOR THREAT ANALYSIS..."
+                        class="url-input"
+                        required
+                        :disabled="analyzing"
+                    >
+                </div>
+                <button 
+                    type="submit"
+                    class="analyze-btn"
+                    :class="{ analyzing: analyzing }"
+                    :disabled="analyzing"
+                    @click="triggerButtonEffect()"
+                >
+                    <div class="btn-hologram" :class="{ active: buttonEffect }"></div>
+                    <span x-show="!analyzing">🔍 INITIATE DEEP SCAN</span>
+                    <span x-show="analyzing">⚡ SCANNING THREAT PATTERNS...</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Results -->
+        <div x-show="result" class="results-container" :class="{ visible: showResults }">
+            <!-- ANALYSIS PROCESS PANEL -->
+            <div class="analysis-process-panel" x-show="showAnalysisProcess" x-transition.duration.300ms>
+                <div class="process-header">
+                    <h3 class="process-title">🔍 ANALYSIS PROCESS</h3>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="process-toggle" @click="showAnalysisSteps = !showAnalysisSteps" x-text="showAnalysisSteps ? 'Hide Steps' : 'Show Steps'">Show Steps</button>
+                        <button class="process-toggle" @click="startAnalysisStream('demo_session_' + Date.now())" style="background: rgba(0,255,255,0.1); border-color: var(--cyber-blue);">📡 Demo Stream</button>
+                    </div>
+                </div>
+                
+                <div class="analysis-steps" x-show="showAnalysisSteps" x-transition.duration.300ms>
+                    <template x-for="step in analysisSteps" :key="step.step_number">
+                        <div class="analysis-step" :class="step.status">
+                            <div class="step-icon" x-text="getStepIcon(step.status)"></div>
+                            <div class="step-content">
+                                <div class="step-name" x-text="`[${step.step_number.toString().padStart(2, '0')}] ${step.phase_name} - ${step.step_name}`"></div>
+                                <div class="step-message" x-text="step.details?.message || 'Processing...'"></div>
+                            </div>
+                            <div class="step-timing">
+                                <div x-text="formatTimestamp(step.timestamp)"></div>
+                                <div class="step-duration" x-show="step.duration_ms > 0" x-text="`${step.duration_ms}ms`"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Comprehensive Analysis Header -->
+            <div x-show="result?.analysis?.comprehensive_analysis" class="comprehensive-header">
+                <div class="threat-level" :class="getThreatClass()" x-text="getThreatTitle()"></div>
+                
+                <div class="analysis-summary">
+                    <div class="summary-stat">
+                        <span class="summary-label">FINAL RISK SCORE:</span>
+                        <span class="summary-value" x-text="getComprehensiveScore()">0.000</span>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="summary-label">ANALYSIS ENGINES:</span>
+                        <span class="summary-value">
+                            <span x-text="getActiveEngines()">0</span>/<span x-text="getTotalEngines()">9</span>
+                        </span>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="summary-label">ANALYSIS TIME:</span>
+                        <span class="summary-value" x-text="getAnalysisTime()">0.000s</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Engines Grid -->
+            <div x-show="result?.analysis?.comprehensive_analysis" class="engines-grid">
+                <!-- ML ENSEMBLE ENGINE -->
+                <div class="engine-card ml-engine">
+                    <h3>🤖 ML ENSEMBLE (7 Models)</h3>
+                    <div class="engine-weight">Weight: 35%</div>
+                    <div class="engine-status" :class="getEngineStatus('ml_ensemble')" x-text="getEngineStatusText('ml_ensemble')">PROCESSING</div>
+                    <div class="engine-score" x-text="getEngineScore('ml_ensemble')">0.000</div>
+                    <div class="ensemble-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">TOTAL MODELS:</span>
+                            <span class="stat-value" x-text="result?.analysis?.total_models || 0">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">ACTIVE MODELS:</span>
+                            <span class="stat-value" x-text="result?.analysis?.active_models || 0">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">THREAT VOTES:</span>
+                            <span class="stat-value" x-text="result?.analysis?.phishing_votes || 0">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">SAFE VOTES:</span>
+                            <span class="stat-value" x-text="result?.analysis?.safe_votes || 0">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXTERNAL THREAT INTEL ENGINE -->
+                <div class="engine-card threat-intel-engine">
+                    <h3>🌐 THREAT INTELLIGENCE</h3>
+                    <div class="engine-weight">Weight: 15%</div>
+                    <div class="engine-status" :class="getEngineStatus('external_threat_intel')" x-text="getEngineStatusText('external_threat_intel')">PROCESSING</div>
+                    <div class="engine-score" x-text="getEngineScore('external_threat_intel')">0.000</div>
+                    <div class="threat-intel-details">
+                        <div class="intel-section">
+                            <div class="intel-label">GOOGLE SAFE BROWSING</div>
+                            <div class="intel-item">Status: <span x-text="getGoogleSafeStatus()">Checking</span></div>
+                            <div class="intel-item">Categories: <span x-text="getGoogleCategories()">None</span></div>
+                            <div class="intel-item">Confidence: <span x-text="getGoogleConfidence()">-</span></div>
+                        </div>
+                        <div class="intel-section">
+                            <div class="intel-label">VIRUSTOTAL</div>
+                            <div class="intel-item">Detections: <span x-text="getVirusTotalDetections()">0/0</span></div>
+                            <div class="intel-item">Risk Level: <span x-text="getVirusTotalRisk()">Unknown</span></div>
+                            <div class="intel-item">Categories: <span x-text="getVirusTotalCategories()">None</span></div>
+                        </div>
+                        <div class="intel-section">
+                            <div class="intel-label">ANALYSIS METRICS</div>
+                            <div class="intel-item">Sources: <span x-text="getThreatSources()">0</span></div>
+                            <div class="intel-item">Cache Hit: <span x-text="getCacheStatus()">No</span></div>
+                            <div class="intel-item">Response Time: <span x-text="getIntelResponseTime()">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NETWORK ANALYSIS ENGINE -->
+                <div class="engine-card network-engine">
+                    <h3>🔒 NETWORK SECURITY</h3>
+                    <div class="engine-weight">Weight: 12%</div>
+                    <div class="engine-status" :class="getEngineStatus('network_analysis')" x-text="getEngineStatusText('network_analysis')">PROCESSING</div>
+                    <div class="engine-score" x-text="getEngineScore('network_analysis')">0.000</div>
+                    <div class="network-details">
+                        <div class="network-section">
+                            <div class="network-label">SSL/TLS ANALYSIS</div>
+                            <div class="network-item">Status: <span x-text="getSSLStatus()">Checking</span></div>
+                            <div class="network-item">Certificate: <span x-text="getSSLCertificate()">-</span></div>
+                            <div class="network-item">Cipher: <span x-text="getSSLCipher()">-</span></div>
+                            <div class="network-item">Expiry: <span x-text="getSSLExpiry()">-</span></div>
+                        </div>
+                        <div class="network-section">
+                            <div class="network-label">DNS ANALYSIS</div>
+                            <div class="network-item">Status: <span x-text="getDNSStatus()">Checking</span></div>
+                            <div class="network-item">Records: <span x-text="getDNSRecords()">-</span></div>
+                            <div class="network-item">SPF/DMARC: <span x-text="getEmailSecurity()">-</span></div>
+                        </div>
+                        <div class="network-section">
+                            <div class="network-label">CONNECTIVITY</div>
+                            <div class="network-item">Accessible: <span x-text="getNetworkAccessible()">-</span></div>
+                            <div class="network-item">Flags: <span x-text="getNetworkFlags()">None</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENT SECURITY ENGINE -->
+                <div class="engine-card content-engine">
+                    <h3>📄 CONTENT SECURITY</h3>
+                    <div class="engine-weight">Weight: 10%</div>
+                    <div class="engine-status" :class="getEngineStatus('content_security')" x-text="getEngineStatusText('content_security')">PROCESSING</div>
+                    <div class="engine-score" x-text="getEngineScore('content_security')">0.000</div>
+                    <div class="engine-details" x-show="!showContentDetails">
+                        <div class="detail-item">JavaScript: <span x-text="getJavaScriptStatus()">Analyzing</span></div>
+                        <div class="detail-item">Social Eng: <span x-text="getSocialEngStatus()">Scanning</span></div>
+                        <div class="detail-item">Forms: <span x-text="getFormSecurityStatus()">Checking</span></div>
+                        <div class="detail-item">Brand: <span x-text="getBrandProtectionStatus()">Verifying</span></div>
+                        <div class="detail-more" @click="showContentDetails = !showContentDetails">
+                            <span class="more-icon">▼</span> DETAILED ANALYSIS
+                        </div>
+                    </div>
+                    
+                    <!-- DETAILED CONTENT SECURITY VIEW -->
+                    <div class="content-details" x-show="showContentDetails" x-transition>
+                        <div class="detail-header" @click="showContentDetails = false">
+                            <span class="more-icon">▲</span> CONTENT SECURITY ANALYSIS
+                        </div>
+                        
+                        <!-- JAVASCRIPT SECURITY -->
+                        <div class="content-section">
+                            <div class="content-label">🔒 JAVASCRIPT SECURITY</div>
+                            <div class="content-metrics">
+                                <div class="content-metric">
+                                    <span class="metric-label">Scripts:</span>
+                                    <span class="metric-value" x-text="getJSScriptCount()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Obfuscated:</span>
+                                    <span class="metric-value" x-text="getJSObfuscated()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">CSP:</span>
+                                    <span class="metric-value" x-text="getCSPStatus()">No</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">External:</span>
+                                    <span class="metric-value" x-text="getJSExternal()">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- SOCIAL ENGINEERING -->
+                        <div class="content-section">
+                            <div class="content-label">🧠 SOCIAL ENGINEERING</div>
+                            <div class="content-metrics">
+                                <div class="content-metric">
+                                    <span class="metric-label">Urgency:</span>
+                                    <span class="metric-value" x-text="getUrgencyCount()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Fear Tactics:</span>
+                                    <span class="metric-value" x-text="getFearTacticsCount()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Authority:</span>
+                                    <span class="metric-value" x-text="getAuthorityCount()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Emotion:</span>
+                                    <span class="metric-value" x-text="getEmotionalManip()">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FORM SECURITY -->
+                        <div class="content-section">
+                            <div class="content-label">📝 FORM SECURITY</div>
+                            <div class="content-metrics">
+                                <div class="content-metric">
+                                    <span class="metric-label">Total Forms:</span>
+                                    <span class="metric-value" x-text="getFormCount()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Credentials:</span>
+                                    <span class="metric-value" x-text="getCredentialForms()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Financial:</span>
+                                    <span class="metric-value" x-text="getFinancialForms()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Hidden Fields:</span>
+                                    <span class="metric-value" x-text="getHiddenFields()">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- CONTENT AUTHENTICITY -->
+                        <div class="content-section">
+                            <div class="content-label">✅ AUTHENTICITY</div>
+                            <div class="content-metrics">
+                                <div class="content-metric">
+                                    <span class="metric-label">Contact Info:</span>
+                                    <span class="metric-value" x-text="getContactInfo()">No</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Privacy Policy:</span>
+                                    <span class="metric-value" x-text="getPrivacyPolicy()">No</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Spelling Errors:</span>
+                                    <span class="metric-value" x-text="getSpellingErrors()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Quality:</span>
+                                    <span class="metric-value" x-text="getContentQuality()">Good</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- BRAND PROTECTION -->
+                        <div class="content-section">
+                            <div class="content-label">🛡️ BRAND PROTECTION</div>
+                            <div class="content-metrics">
+                                <div class="content-metric">
+                                    <span class="metric-label">Suspected Brand:</span>
+                                    <span class="metric-value" x-text="getSuspectedBrand()">None</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Typosquatting:</span>
+                                    <span class="metric-value" x-text="getTyposquatting()">No</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Confidence:</span>
+                                    <span class="metric-value" x-text="getBrandConfidence()">0%</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Favicon:</span>
+                                    <span class="metric-value" x-text="getFaviconStatus()">Unknown</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BEHAVIORAL ANALYSIS ENGINE -->
+                <div class="engine-card behavioral-engine">
+                    <h3>👤 BEHAVIORAL ANALYSIS</h3>
+                    <div class="engine-weight">Weight: 8%</div>
+                    <div class="engine-status" :class="getEngineStatus('behavioral_analysis')" x-text="getEngineStatusText('behavioral_analysis')">PROCESSING</div>
+                    <div class="engine-score" x-text="getEngineScore('behavioral_analysis')">0.000</div>
+                    <div class="engine-details" x-show="!showBehavioralDetails">
+                        <div class="detail-item">Automation: <span x-text="getAutomationScore()">None</span></div>
+                        <div class="detail-item">Session: <span x-text="getSessionQuality()">Normal</span></div>
+                        <div class="detail-item">Human Score: <span x-text="getHumanScore()">0.5</span></div>
+                        <div class="detail-item">Tracking: <span x-text="getTrackingType()">Simulated</span></div>
+                        <div class="detail-more" @click="showBehavioralDetails = !showBehavioralDetails">
+                            <span class="more-icon">▼</span> DETAILED ANALYSIS
+                        </div>
+                    </div>
+
+                    <!-- DETAILED BEHAVIORAL VIEW -->
+                    <div class="content-details" x-show="showBehavioralDetails" x-transition>
+                        <div class="detail-header" @click="showBehavioralDetails = false">
+                            <span class="more-icon">▲</span> BEHAVIORAL ANALYSIS
+                        </div>
+                        
+                        <!-- MOUSE BEHAVIOR -->
+                        <div class="content-section">
+                            <div class="content-label">🖱️ MOUSE BEHAVIOR</div>
+                            <div class="content-metrics">
+                                <div class="content-metric">
+                                    <span class="metric-label">Movements:</span>
+                                    <span class="metric-value" x-text="getMouseMovements()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Velocity:</span>
+                                    <span class="metric-value" x-text="getMouseVelocity()">0px/s</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Human-like:</span>
+                                    <span class="metric-value" x-text="getMouseHumanness()">50%</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Pattern:</span>
+                                    <span class="metric-value" x-text="getMousePattern()">Normal</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- CLICK BEHAVIOR -->
+                        <div class="content-section">
+                            <div class="content-label">👆 CLICK BEHAVIOR</div>
+                            <div class="content-metrics">
+                                <div class="content-metric">
+                                    <span class="metric-label">Total Clicks:</span>
+                                    <span class="metric-value" x-text="getTotalClicks()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Rapid Clicks:</span>
+                                    <span class="metric-value" x-text="getRapidClicks()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Avg Interval:</span>
+                                    <span class="metric-value" x-text="getClickInterval()">0ms</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Pattern:</span>
+                                    <span class="metric-value" x-text="getClickPattern()">Normal</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- KEYBOARD BEHAVIOR -->
+                        <div class="content-section">
+                            <div class="content-label">⌨️ KEYBOARD BEHAVIOR</div>
+                            <div class="content-metrics">
+                                <div class="content-metric">
+                                    <span class="metric-label">Keystrokes:</span>
+                                    <span class="metric-value" x-text="getTotalKeystrokes()">0</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Typing Speed:</span>
+                                    <span class="metric-value" x-text="getTypingSpeed()">0 keys/s</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Dwell Time:</span>
+                                    <span class="metric-value" x-text="getDwellTime()">0ms</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Pattern:</span>
+                                    <span class="metric-value" x-text="getKeyboardPattern()">Normal</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ENGAGEMENT ANALYSIS -->
+                        <div class="content-section">
+                            <div class="content-label">📊 ENGAGEMENT</div>
+                            <div class="content-metrics">
+                                <div class="content-metric">
+                                    <span class="metric-label">Session Time:</span>
+                                    <span class="metric-value" x-text="getSessionTime()">0s</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Active Time:</span>
+                                    <span class="metric-value" x-text="getActiveTime()">0s</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Engagement:</span>
+                                    <span class="metric-value" x-text="getEngagementRatio()">0%</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Interactions:</span>
+                                    <span class="metric-value" x-text="getInteractionCount()">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- RISK FACTORS -->
+                        <div class="content-section">
+                            <div class="content-label">⚠️ RISK FACTORS</div>
+                            <div class="content-metrics" style="grid-template-columns: 1fr;">
+                                <div class="content-metric">
+                                    <span class="metric-label">Detected Flags:</span>
+                                    <span class="metric-value" x-text="getBehavioralFlags()">None</span>
+                                </div>
+                                <div class="content-metric">
+                                    <span class="metric-label">Recommendations:</span>
+                                    <span class="metric-value" x-text="getBehavioralRecommendations()">None</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISUAL DETECTION ENGINE -->
+                <div class="engine-card visual-engine">
+                    <h3>👁️ VISUAL DETECTION</h3>
+                    <div class="engine-weight">Weight: 8%</div>
+                    <div class="engine-status" :class="getEngineStatus('visual_detection')" x-text="getEngineStatusText('visual_detection')">PROCESSING</div>
+                    <div class="engine-score" x-text="getEngineScore('visual_detection')">0.000</div>
+                    <div class="engine-details">
+                        <div class="detail-item">Brand: <span x-text="getBrandImpersonation()">None</span></div>
+                        <div class="detail-item">Spoofing: <span x-text="getVisualSpoofing()">None</span></div>
+                    </div>
+                </div>
+
+                <!-- URL TRUNCATION ENGINE -->
+                <div class="engine-card truncation-engine">
+                    <h3>🔗 URL TRUNCATION</h3>
+                    <div class="engine-weight">Weight: 5%</div>
+                    <div class="engine-status" :class="getEngineStatus('url_truncation')" x-text="getEngineStatusText('url_truncation')">PROCESSING</div>
+                    <div class="engine-score" x-text="getEngineScore('url_truncation')">0.000</div>
+                    <div class="engine-details">
+                        <div class="detail-item">Manipulation: <span x-text="getURLManipulation()">None</span></div>
+                    </div>
+                </div>
+
+                <!-- WHITELIST/BLACKLIST ENGINE -->
+                <div class="engine-card wbl-engine">
+                    <h3>📋 WHITELIST/BLACKLIST</h3>
+                    <div class="engine-weight">Weight: 4%</div>
+                    <div class="engine-status" :class="getEngineStatus('whitelist_blacklist')" x-text="getEngineStatusText('whitelist_blacklist')">PROCESSING</div>
+                    <div class="engine-score" x-text="getEngineScore('whitelist_blacklist')">0.000</div>
+                    <div class="engine-details">
+                        <div class="detail-item">Listed: <span x-text="getWBLSource()">None</span></div>
+                    </div>
+                </div>
+
+                <!-- FALSE POSITIVE ENGINE -->
+                <div class="engine-card fp-engine">
+                    <h3>✅ FALSE POSITIVE</h3>
+                    <div class="engine-weight">Weight: 3%</div>
+                    <div class="engine-status" :class="getEngineStatus('false_positive')" x-text="getEngineStatusText('false_positive')">PROCESSING</div>
+                    <div class="engine-score" x-text="getEngineScore('false_positive')">0.000</div>
+                    <div class="engine-details">
+                        <div class="detail-item">Known FP: <span x-text="getKnownFP()">No</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEGACY RESULT DISPLAY -->
+            <div x-show="!result?.analysis?.comprehensive_analysis" class="result-header">
+                <h2 class="threat-level" :class="getThreatClass()" x-text="getThreatTitle()"></h2>
+                
+                <!-- 3D RADAR CHART -->
+                <div class="radar-chart-container">
+                    <div class="radar-chart">
+                        <div class="radar-ring"></div>
+                        <div class="radar-ring"></div>
+                        <div class="radar-ring"></div>
+                        <div class="radar-ring"></div>
+                        <div class="radar-sweep"></div>
+                        <div class="threat-indicator" :class="getThreatClass()" 
+                             :style="'top: ' + (50 - (result?.confidence * 20 || 0)) + '%; left: ' + (50 + (result?.confidence * 15 || 0)) + '%;'"></div>
+                    </div>
+                </div>
+                
+                <div class="confidence-meter">
+                    <div class="confidence-fill" :style="'width: ' + (result?.confidence * 100 || 0) + '%'"></div>
+                </div>
+                <p x-text="'CONFIDENCE LEVEL: ' + ((result?.confidence * 100) || 0).toFixed(1) + '%'"></p>
+            </div>
+
+            <!-- Voting Statistics -->
+            <div class="voting-grid">
+                <div class="voting-card">
+                    <h3>TOTAL MODELS</h3>
+                    <div style="font-size: 36px; font-weight: 900; color: var(--cyber-blue);" x-text="result?.analysis?.total_models || 7"></div>
+                </div>
+                <div class="voting-card">
+                    <h3>ACTIVE MODELS</h3>
+                    <div style="font-size: 36px; font-weight: 900; color: var(--cyber-green);" x-text="result?.analysis?.active_models || 0"></div>
+                </div>
+                <div class="voting-card">
+                    <h3>THREAT VOTES</h3>
+                    <div style="font-size: 36px; font-weight: 900; color: var(--cyber-red);" x-text="result?.analysis?.phishing_votes || 0"></div>
+                </div>
+                <div class="voting-card">
+                    <h3>SAFE VOTES</h3>
+                    <div style="font-size: 36px; font-weight: 900; color: var(--cyber-green);" x-text="result?.analysis?.safe_votes || 0"></div>
+                </div>
+            </div>
+
+            <!-- Model Results -->
+            <div x-show="result?.analysis?.individual_models" class="models-grid">
+                <template x-for="(model, name) in result?.analysis?.individual_models" :key="name">
+                    <div class="model-card">
+                        <div class="model-header">
+                            <h4 class="model-name" x-text="getModelDisplayName(name)"></h4>
+                            <span class="model-prediction" :class="model.prediction.toLowerCase()" x-text="model.prediction"></span>
+                        </div>
+                        <div class="model-progress">
+                            <div 
+                                class="model-progress-fill" 
+                                :class="{ phishing: model.prediction.toLowerCase() === 'phishing' }"
+                                :style="'width: ' + (model.confidence * 100) + '%'"
+                            ></div>
+                        </div>
+                        <p x-text="(model.confidence * 100).toFixed(1) + '% CONFIDENCE'"></p>
+                        
+                        <!-- Model Explanation -->
+                        <div x-show="model.explanation" class="model-explanation" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #00ffff40;">
+                            <div style="color: #00ffff; font-size: 11px; font-weight: bold; margin-bottom: 5px;">AÇIKLAMA:</div>
+                            <div style="color: #ffffff; font-size: 10px; margin-bottom: 5px;" x-text="model.explanation?.decision_reason || 'Açıklama bulunamadı'"></div>
+                            
+                            <!-- Risk Factors -->
+                            <div x-show="model.explanation?.risk_factors?.length > 0" style="margin-bottom: 5px;">
+                                <div style="color: #ff4444; font-size: 10px; font-weight: bold; margin-bottom: 3px;">RİSK FAKTÖRLERİ:</div>
+                                <template x-for="factor in model.explanation?.risk_factors || []" :key="factor">
+                                    <div style="color: #ff8888; font-size: 9px; margin-bottom: 2px;">• <span x-text="factor"></span></div>
+                                </template>
+                            </div>
+                            
+                            <!-- Confidence Factors -->
+                            <div x-show="model.explanation?.confidence_factors?.length > 0">
+                                <div style="color: #44ff44; font-size: 10px; font-weight: bold; margin-bottom: 3px;">GÜVEN FAKTÖRLERİ:</div>
+                                <template x-for="factor in model.explanation?.confidence_factors || []" :key="factor">
+                                    <div style="color: #88ff88; font-size: 9px; margin-bottom: 2px;">• <span x-text="factor"></span></div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="feedback-section">
+                <h3>OPERATOR FEEDBACK REQUIRED</h3>
+                <p>Did our threat assessment match your analysis?</p>
+                <div class="feedback-buttons">
+                    <button class="feedback-btn correct" @click="submitFeedback('correct')">
+                        ✓ ASSESSMENT CORRECT
+                    </button>
+                    <button class="feedback-btn incorrect" @click="submitFeedback('incorrect')">
+                        ✗ REASSESSMENT NEEDED
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="real_behavioral_tracker.js"></script>
+    <script>
+        // Initialize Real Behavioral Tracker
+        let behavioralTracker = null;
+        
+        // Web Audio API için SES SİSTEMİ
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function createTone(frequency, type = 'sine', duration = 0.3, volume = 0.1) {
+            return new Promise((resolve) => {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + duration);
+                
+                oscillator.onended = resolve;
+            });
+        }
+
+        // Sound System
+        const sounds = {
+            async boot() {
+                await createTone(440, 'sine', 2, 0.2);
+                await createTone(220, 'sine', 1, 0.15);
+            },
+            async scan() {
+                await createTone(800, 'square', 0.1, 0.1);
+                await createTone(1200, 'square', 0.1, 0.1);
+            },
+            async success() {
+                await createTone(523, 'sine', 0.2, 0.15);
+                await createTone(659, 'sine', 0.2, 0.15);
+                await createTone(784, 'sine', 0.4, 0.15);
+            },
+            async warning() {
+                for (let i = 0; i < 3; i++) {
+                    await createTone(1000, 'triangle', 0.2, 0.2);
+                    await new Promise(r => setTimeout(r, 100));
+                }
+            },
+            async feedback() {
+                await createTone(600, 'sine', 0.15, 0.1);
+            }
+        };
+
+        // Matrix Rain Effect
+        function initMatrix() {
+            const canvas = document.getElementById('matrix-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}".split("");
+            const fontSize = 10;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+            
+            for (let x = 0; x < columns; x++) {
+                drops[x] = 1;
+            }
+            
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#00FF00';
+                ctx.font = fontSize + 'px monospace';
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = letters[Math.floor(Math.random() * letters.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(draw, 35);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', async () => {
+            // Initialize Real Behavioral Tracker
+            try {
+                behavioralTracker = new RealBehavioralTracker();
+                console.log('🎯 Real Behavioral Tracker initialized successfully');
+            } catch (error) {
+                console.warn('⚠️ Failed to initialize behavioral tracker:', error);
+            }
+            
+            // Play boot sound
+            await sounds.boot();
+            
+            // Initialize matrix
+            initMatrix();
+            
+            // Hide splash after 2 seconds (shorter)
+            setTimeout(() => {
+                document.getElementById('splash-screen').classList.add('hidden');
+            }, 2000);
+            
+            // Emergency splash skip button
+            document.addEventListener('click', () => {
+                document.getElementById('splash-screen').classList.add('hidden');
+            });
+            
+            // Keyboard skip (Space or Enter)
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' || e.code === 'Enter') {
+                    document.getElementById('splash-screen').classList.add('hidden');
+                }
+            });
+        });
+
+        // Alpine.js Component
+        function cyberPhishingDetector() {
+            return {
+                targetUrl: '',
+                result: null,
+                analyzing: false,
+                scanning: false,
+                glitching: false,
+                buttonEffect: false,
+                showResults: false,
+                showContentDetails: false,
+                showBehavioralDetails: false,
+                showAnalysisProcess: false,
+                showAnalysisSteps: false,
+                analysisSteps: [],
+                eventSource: null,
+
+                async triggerButtonEffect() {
+                    this.buttonEffect = true;
+                    this.glitching = true;
+                    
+                    // Play scan sound
+                    await sounds.scan();
+                    
+                    setTimeout(() => {
+                        this.buttonEffect = false;
+                        this.glitching = false;
+                    }, 600);
+                },
+
+                async initiateAnalysis() {
+                    if (!this.targetUrl.trim() || this.analyzing) return;
+                    
+                    // Resume audio context if suspended
+                    if (audioCtx.state === 'suspended') {
+                        await audioCtx.resume();
+                    }
+                    
+                    this.analyzing = true;
+                    this.scanning = true;
+                    this.result = null;
+                    this.showResults = false;
+                    
+                    // Generate session ID for streaming
+                    const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    
+                    // Start analysis stream for real-time updates
+                    this.startAnalysisStream(sessionId);
+                    
+                    // Create packet flow effect
+                    this.createPacketFlow();
+                    
+                    try {
+                        const response = await fetch('/analyze', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ url: this.targetUrl.trim() })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+
+                        this.result = await response.json();
+                        
+                        // Process analysis log if available
+                        if (this.result.analysis?.comprehensive_analysis?.analysis_log) {
+                            this.processAnalysisLog(this.result.analysis.comprehensive_analysis.analysis_log);
+                            this.showAnalysisProcess = true;
+                        }
+                        
+                        // Play result sound
+                        if (this.result.prediction === 'safe') {
+                            await sounds.success();
+                        } else {
+                            await sounds.warning();
+                        }
+                        
+                        // Show results with delay for dramatic effect
+                        setTimeout(() => {
+                            this.showResults = true;
+                        }, 500);
+                        
+                    } catch (err) {
+                        console.error('Analysis error:', err);
+                        await sounds.warning();
+                    } finally {
+                        this.analyzing = false;
+                        this.scanning = false;
+                        
+                        // Stop analysis stream
+                        setTimeout(() => {
+                            this.stopAnalysisStream();
+                        }, 2000); // 2 saniye sonra stream'i durdur
+                    }
+                },
+
+                createPacketFlow() {
+                    const container = document.querySelector('.packet-flow');
+                    
+                    for (let i = 0; i < 20; i++) {
+                        setTimeout(() => {
+                            const packet = document.createElement('div');
+                            packet.className = 'packet';
+                            packet.style.top = Math.random() * 100 + 'vh';
+                            packet.style.left = Math.random() * 100 + 'vw';
+                            container.appendChild(packet);
+                            
+                            setTimeout(() => packet.remove(), 2000);
+                        }, i * 100);
+                    }
+                },
+
+                getThreatClass() {
+                    if (!this.result) return '';
+                    const prediction = this.result.prediction?.toLowerCase();
+                    if (prediction === 'safe') return 'safe';
+                    if (prediction === 'phishing') return 'danger';
+                    return 'warning';
+                },
+
+                getThreatTitle() {
+                    if (!this.result) return '';
+                    
+                    // Öncelik sırası: comprehensive_analysis.final_decision > ensemble_prediction > prediction
+                    let finalDecision = '';
+                    if (this.result.analysis?.comprehensive_analysis?.final_decision) {
+                        finalDecision = this.result.analysis.comprehensive_analysis.final_decision.toLowerCase();
+                        console.log('🎯 Using comprehensive_analysis.final_decision:', finalDecision);
+                    } else if (this.result.analysis?.ensemble_prediction) {
+                        finalDecision = this.result.analysis.ensemble_prediction.toLowerCase();
+                        console.log('🤖 Using ensemble_prediction:', finalDecision);
+                    } else {
+                        finalDecision = this.result.prediction?.toLowerCase();
+                        console.log('⚠️ Using fallback prediction:', finalDecision);
+                    }
+                    
+                    if (finalDecision === 'safe') return '🛡️ SECURE ASSET';
+                    if (finalDecision === 'phishing') return '🚨 THREAT DETECTED';
+                    return '⚠️ UNKNOWN SIGNATURE';
+                },
+
+                // COMPREHENSIVE ANALYSIS FUNCTIONS
+                getComprehensiveScore() {
+                    if (!this.result?.analysis?.comprehensive_analysis) return '0.000';
+                    return (this.result.analysis.comprehensive_analysis.final_risk_score || 0).toFixed(3);
+                },
+
+                getActiveEngines() {
+                    if (!this.result?.analysis?.comprehensive_analysis) return 0;
+                    const engines = this.result.analysis.comprehensive_analysis.analysis_engines || {};
+                    return Object.keys(engines).filter(key => 
+                        engines[key]?.status === 'success' || engines[key]?.status === 'completed'
+                    ).length;
+                },
+
+                getTotalEngines() {
+                    return 9; // Total number of analysis engines
+                },
+
+                getAnalysisTime() {
+                    if (!this.result?.analysis?.comprehensive_analysis) return '0.000s';
+                    return ((this.result.analysis.comprehensive_analysis.analysis_duration_ms || 0) / 1000).toFixed(3) + 's';
+                },
+
+                getEngineStatus(engineName) {
+                    if (!this.result?.analysis?.comprehensive_analysis?.analysis_engines) return 'processing';
+                    const engine = this.result.analysis.comprehensive_analysis.analysis_engines[engineName];
+                    if (!engine) return 'processing';
+                    
+                    const score = engine.risk_score || 0;
+                    if (engine.status === 'error') return 'danger';
+                    if (score > 0.7) return 'danger';
+                    if (score > 0.4) return 'warning';
+                    return 'success';
+                },
+
+                getEngineStatusText(engineName) {
+                    if (!this.result?.analysis?.comprehensive_analysis?.analysis_engines) return 'PROCESSING';
+                    const engine = this.result.analysis.comprehensive_analysis.analysis_engines[engineName];
+                    if (!engine) return 'PROCESSING';
+                    
+                    if (engine.status === 'error') return 'ERROR';
+                    if (engine.status === 'success' || engine.status === 'completed') return 'COMPLETE';
+                    return 'PROCESSING';
+                },
+
+                getEngineScore(engineName) {
+                    if (!this.result?.analysis?.comprehensive_analysis?.analysis_engines) return '0.000';
+                    const engine = this.result.analysis.comprehensive_analysis.analysis_engines[engineName];
+                    return (engine?.risk_score || 0).toFixed(3);
+                },
+
+                // Engine-specific detail functions
+                getThreatSources() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    return engine?.threat_sources?.length || 0;
+                },
+
+                getThreatCategories() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    return engine?.threat_categories?.join(', ') || 'None';
+                },
+
+                // THREAT INTELLIGENCE DETAILED FUNCTIONS
+                getGoogleSafeStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    const google = engine?.google_safe_browsing;
+                    if (!google) return 'Not Checked';
+                    if (google.threat_types && google.threat_types.length > 0) return '⚠️ THREAT';
+                    return '✅ CLEAN';
+                },
+
+                getGoogleCategories() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    const google = engine?.google_safe_browsing;
+                    if (!google || !google.threat_types) return 'None';
+                    return google.threat_types.join(', ') || 'None';
+                },
+
+                getGoogleConfidence() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    const google = engine?.google_safe_browsing;
+                    if (!google) return '-';
+                    return ((google.confidence || 0) * 100).toFixed(0) + '%';
+                },
+
+                getVirusTotalDetections() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    const vt = engine?.virustotal;
+                    if (!vt) return '0/0';
+                    return `${vt.positives || 0}/${vt.total || 0}`;
+                },
+
+                getVirusTotalRisk() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    const vt = engine?.virustotal;
+                    if (!vt) return 'Unknown';
+                    const risk = vt.risk_score || 0;
+                    if (risk > 0.7) return '🔴 HIGH';
+                    if (risk > 0.3) return '🟡 MEDIUM';
+                    return '🟢 LOW';
+                },
+
+                getVirusTotalCategories() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    const vt = engine?.virustotal;
+                    if (!vt || !vt.categories) return 'None';
+                    return vt.categories.join(', ') || 'None';
+                },
+
+                getCacheStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    return engine?.cache_hit ? '✅ YES' : '❌ NO';
+                },
+
+                getIntelResponseTime() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.external_threat_intel;
+                    const responseTime = engine?.response_time_ms;
+                    if (!responseTime) return '-';
+                    return responseTime + 'ms';
+                },
+
+                getSSLStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.network_analysis;
+                    const ssl = engine?.ssl_analysis;
+                    if (!ssl) return 'Not Checked';
+                    
+                    const flags = ssl.ssl_flags || [];
+                    if (flags.includes('certificate_expired')) return '🔴 EXPIRED';
+                    if (flags.includes('certificate_expiring_soon')) return '🟡 EXPIRING';
+                    if (flags.includes('weak_cipher') || flags.includes('weak_key_length')) return '🟡 WEAK';
+                    if (flags.includes('outdated_ssl_version')) return '🔴 OUTDATED';
+                    return '✅ VALID';
+                },
+
+                getDNSStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.network_analysis;
+                    const dns = engine?.dns_analysis;
+                    if (!dns) return 'Not Checked';
+                    
+                    const flags = dns.dns_flags || [];
+                    if (flags.includes('no_a_record')) return '🔴 NO A RECORD';
+                    if (flags.includes('suspicious_domain_pattern')) return '🔴 SUSPICIOUS';
+                    if (flags.includes('punycode_domain')) return '🟡 PUNYCODE';
+                    if (flags.includes('no_spf_record') || flags.includes('no_dmarc_record')) return '🟡 INSECURE';
+                    return '✅ SECURE';
+                },
+
+                // NETWORK SECURITY DETAILED FUNCTIONS
+                getSSLCertificate() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.network_analysis;
+                    const ssl = engine?.ssl_analysis?.certificate_info;
+                    if (!ssl || !ssl.issuer) return 'None';
+                    
+                    // Extract issuer name
+                    const issuer = ssl.issuer;
+                    const cn = issuer.find(item => item[0] && item[0][0] === 'organizationName');
+                    return cn ? cn[0][1] : 'Unknown';
+                },
+
+                getSSLCipher() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.network_analysis;
+                    const ssl = engine?.ssl_analysis?.security_analysis;
+                    if (!ssl) return 'None';
+                    
+                    const version = ssl.ssl_version || '';
+                    const keyLength = ssl.key_length || '';
+                    return version && keyLength ? `${version}/${keyLength}bit` : 'Unknown';
+                },
+
+                getSSLExpiry() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.network_analysis;
+                    const ssl = engine?.ssl_analysis?.certificate_info;
+                    if (!ssl || !ssl.days_until_expiry) return 'Unknown';
+                    
+                    const days = ssl.days_until_expiry;
+                    if (days < 0) return `🔴 EXPIRED ${Math.abs(days)}d ago`;
+                    if (days < 30) return `🟡 ${days}d left`;
+                    return `✅ ${days}d left`;
+                },
+
+                getDNSRecords() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.network_analysis;
+                    const dns = engine?.dns_analysis?.dns_records;
+                    if (!dns) return 'None';
+                    
+                    const records = [];
+                    if (dns.A) records.push(`A(${dns.A.length})`);
+                    if (dns.MX) records.push(`MX(${dns.MX.length})`);
+                    if (dns.NS) records.push(`NS(${dns.NS.length})`);
+                    if (dns.TXT) records.push(`TXT(${dns.TXT.length})`);
+                    
+                    return records.length ? records.join(', ') : 'None';
+                },
+
+                getEmailSecurity() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.network_analysis;
+                    const dns = engine?.dns_analysis;
+                    if (!dns) return 'Unknown';
+                    
+                    const flags = dns.dns_flags || [];
+                    const hasSPF = !flags.includes('no_spf_record');
+                    const hasDMARC = !flags.includes('no_dmarc_record');
+                    
+                    if (hasSPF && hasDMARC) return '✅ FULL';
+                    if (hasSPF || hasDMARC) return '🟡 PARTIAL';
+                    return '🔴 NONE';
+                },
+
+                getNetworkAccessible() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.network_analysis;
+                    return engine?.network_accessible ? '✅ YES' : '❌ NO';
+                },
+
+                getNetworkFlags() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.network_analysis;
+                    const flags = engine?.network_flags || [];
+                    if (flags.length === 0) return 'None';
+                    return flags.slice(0, 3).join(', '); // Show first 3 flags
+                },
+
+                // Content Security Functions
+                getJavaScriptStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    const js = engine?.security_analysis?.javascript_security;
+                    if (!js) return 'Unknown';
+                    
+                    if (js.obfuscated_scripts > 0) return '🔴 THREATS';
+                    if (js.external_scripts > 10) return '🟡 HIGH EXTERNAL';
+                    if (!js.csp_present) return '🟡 NO CSP';
+                    return '✅ SECURE';
+                },
+
+                getSocialEngStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    const social = engine?.security_analysis?.social_engineering;
+                    if (!social) return 'Unknown';
+                    
+                    if (social.fear_tactics?.length > 0) return '🔴 FEAR TACTICS';
+                    if (social.urgency_indicators?.length > 0) return '🟡 URGENCY';
+                    if (social.authority_claims?.length > 0) return '🟡 AUTHORITY';
+                    return '✅ CLEAN';
+                },
+
+                getFormSecurityStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    const forms = engine?.security_analysis?.form_security;
+                    if (!forms) return 'Unknown';
+                    
+                    if (forms.credential_forms > 0) return '🔴 CREDENTIALS';
+                    if (forms.financial_forms > 0) return '🔴 FINANCIAL';
+                    if (forms.suspicious_actions?.length > 0) return '🟡 SUSPICIOUS';
+                    if (forms.form_count === 0) return '➖ NO FORMS';
+                    return '✅ SECURE';
+                },
+
+                getBrandProtectionStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    const brand = engine?.security_analysis?.brand_protection;
+                    if (!brand) return 'Unknown';
+                    
+                    if (brand.suspected_brand) return `🔴 ${brand.suspected_brand.toUpperCase()} SPOOF`;
+                    if (brand.typosquatting_detected) return '🟡 TYPOSQUATTING';
+                    return '✅ LEGITIMATE';
+                },
+
+                // JavaScript Security Details
+                getJSScriptCount() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.javascript_security?.script_count || 0;
+                },
+
+                getJSObfuscated() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.javascript_security?.obfuscated_scripts || 0;
+                },
+
+                getCSPStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.javascript_security?.csp_present ? '✅ YES' : '❌ NO';
+                },
+
+                getJSExternal() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.javascript_security?.external_scripts || 0;
+                },
+
+                // Social Engineering Details
+                getUrgencyCount() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.social_engineering?.urgency_indicators?.length || 0;
+                },
+
+                getFearTacticsCount() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.social_engineering?.fear_tactics?.length || 0;
+                },
+
+                getAuthorityCount() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.social_engineering?.authority_claims?.length || 0;
+                },
+
+                getEmotionalManip() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.social_engineering?.emotional_manipulation || 0;
+                },
+
+                // Form Security Details
+                getFormCount() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.form_security?.form_count || 0;
+                },
+
+                getCredentialForms() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.form_security?.credential_forms || 0;
+                },
+
+                getFinancialForms() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.form_security?.financial_forms || 0;
+                },
+
+                getHiddenFields() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.form_security?.hidden_fields || 0;
+                },
+
+                // Content Authenticity Details
+                getContactInfo() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.content_authenticity?.has_contact_info ? '✅ YES' : '❌ NO';
+                },
+
+                getPrivacyPolicy() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.content_authenticity?.has_privacy_policy ? '✅ YES' : '❌ NO';
+                },
+
+                getSpellingErrors() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.content_authenticity?.spelling_errors || 0;
+                },
+
+                getContentQuality() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    const score = engine?.security_analysis?.content_authenticity?.content_quality_score || 0;
+                    if (score > 0.5) return '🔴 POOR';
+                    if (score > 0.2) return '🟡 FAIR';
+                    return '✅ GOOD';
+                },
+
+                // Brand Protection Details
+                getSuspectedBrand() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.brand_protection?.suspected_brand?.toUpperCase() || 'NONE';
+                },
+
+                getTyposquatting() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    return engine?.security_analysis?.brand_protection?.typosquatting_detected ? '🔴 YES' : '✅ NO';
+                },
+
+                getBrandConfidence() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    const conf = engine?.security_analysis?.brand_protection?.impersonation_confidence || 0;
+                    return Math.round(conf * 100) + '%';
+                },
+
+                getFaviconStatus() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.content_security;
+                    const favicon = engine?.security_analysis?.brand_protection?.favicon_analysis;
+                    if (!favicon) return 'UNKNOWN';
+                    if (favicon.suspicious) return '🔴 SUSPICIOUS';
+                    if (favicon.present) return '✅ PRESENT';
+                    return '❌ MISSING';
+                },
+
+                getAutomationScore() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    if (!engine) return 'None';
+                    
+                    const automationScore = engine.advanced_analysis?.automation_score || 0;
+                    const automationDetected = engine.automation_detected;
+                    
+                    if (automationDetected || automationScore > 0.7) return '🤖 Detected';
+                    if (automationScore > 0.3) return '⚠️ Suspicious';
+                    return '✅ None';
+                },
+
+                getSessionQuality() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    if (!engine) return 'Unknown';
+                    
+                    const sessionQuality = engine.session_quality || 'normal';
+                    const qualityMap = {
+                        'clean': '✅ Clean',
+                        'normal': '🟢 Normal', 
+                        'suspicious': '🟡 Suspicious',
+                        'high_risk': '🔴 High Risk',
+                        'automated': '🤖 Automated'
+                    };
+                    
+                    return qualityMap[sessionQuality] || sessionQuality.charAt(0).toUpperCase() + sessionQuality.slice(1);
+                },
+
+                // DETAILED BEHAVIORAL ANALYSIS FUNCTIONS
+                getHumanScore() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    if (!engine) return '0.5';
+                    const humanScore = engine.human_score || 0.5;
+                    return (humanScore * 100).toFixed(0) + '%';
+                },
+
+                getTrackingType() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    if (!engine) return 'Unknown';
+                    const trackingType = engine.tracking_type || 'simulated_analysis';
+                    if (trackingType === 'real_behavioral_data') return '🔴 REAL DATA';
+                    return '🟡 SIMULATED';
+                },
+
+                // Mouse Behavior Functions
+                getMouseMovements() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const mouseMetrics = engine?.mouse_analysis?.metrics;
+                    return mouseMetrics?.total_movements || 0;
+                },
+
+                getMouseVelocity() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const mouseMetrics = engine?.mouse_analysis?.metrics;
+                    const velocity = mouseMetrics?.average_velocity || 0;
+                    return Math.round(velocity) + 'px/s';
+                },
+
+                getMouseHumanness() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const mouseMetrics = engine?.mouse_analysis?.metrics;
+                    const humanness = mouseMetrics?.human_likeness || 0.5;
+                    return Math.round(humanness * 100) + '%';
+                },
+
+                getMousePattern() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const riskFactors = engine?.mouse_analysis?.risk_factors || [];
+                    if (riskFactors.includes('non_human_mouse_pattern')) return '🔴 BOT-LIKE';
+                    if (riskFactors.includes('too_slow_mouse_movement')) return '🟡 TOO SLOW';
+                    if (riskFactors.includes('too_fast_mouse_movement')) return '🟡 TOO FAST';
+                    return '✅ HUMAN-LIKE';
+                },
+
+                // Click Behavior Functions
+                getTotalClicks() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const clickMetrics = engine?.click_analysis?.metrics;
+                    return clickMetrics?.total_clicks || 0;
+                },
+
+                getRapidClicks() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const clickMetrics = engine?.click_analysis?.metrics;
+                    return clickMetrics?.rapid_clicks || 0;
+                },
+
+                getClickInterval() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const clickMetrics = engine?.click_analysis?.metrics;
+                    const interval = clickMetrics?.average_interval || 0;
+                    return Math.round(interval) + 'ms';
+                },
+
+                getClickPattern() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const riskFactors = engine?.click_analysis?.risk_factors || [];
+                    if (riskFactors.includes('excessive_rapid_clicks')) return '🔴 TOO RAPID';
+                    if (riskFactors.includes('too_fast_clicking')) return '🔴 BOT-LIKE';
+                    return '✅ HUMAN-LIKE';
+                },
+
+                // Keyboard Behavior Functions
+                getTotalKeystrokes() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const keyboardMetrics = engine?.keyboard_analysis?.metrics;
+                    return keyboardMetrics?.total_keystrokes || 0;
+                },
+
+                getTypingSpeed() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const keyboardMetrics = engine?.keyboard_analysis?.metrics;
+                    const speed = keyboardMetrics?.average_typing_speed || 0;
+                    return speed.toFixed(1) + ' keys/s';
+                },
+
+                getDwellTime() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const keyboardMetrics = engine?.keyboard_analysis?.metrics;
+                    const dwell = keyboardMetrics?.average_dwell_time || 0;
+                    return Math.round(dwell) + 'ms';
+                },
+
+                getKeyboardPattern() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const riskFactors = engine?.keyboard_analysis?.risk_factors || [];
+                    if (riskFactors.includes('too_fast_typing')) return '🔴 TOO FAST';
+                    return '✅ HUMAN-LIKE';
+                },
+
+                // Engagement Functions
+                getSessionTime() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const engagementMetrics = engine?.engagement_analysis?.metrics;
+                    const time = engagementMetrics?.session_time || 0;
+                    return Math.round(time / 1000) + 's';
+                },
+
+                getActiveTime() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const engagementMetrics = engine?.engagement_analysis?.metrics;
+                    const activeTime = engagementMetrics?.active_time || 0;
+                    return Math.round(activeTime / 1000) + 's';
+                },
+
+                getEngagementRatio() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const engagementMetrics = engine?.engagement_analysis?.metrics;
+                    const ratio = engagementMetrics?.engagement_ratio || 0;
+                    return Math.round(ratio * 100) + '%';
+                },
+
+                getInteractionCount() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const engagementMetrics = engine?.engagement_analysis?.metrics;
+                    return engagementMetrics?.interaction_count || 0;
+                },
+
+                // Risk and Recommendations
+                getBehavioralFlags() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const flags = engine?.behavioral_flags || [];
+                    if (flags.length === 0) return 'None';
+                    const flagMap = {
+                        'automation_detected': '🤖 AUTOMATION',
+                        'high_risk_behavior': '🔴 HIGH RISK',
+                        'suspicious_behavior': '🟡 SUSPICIOUS',
+                        'rapid_clicking': '⚡ RAPID CLICK',
+                        'low_engagement': '📉 LOW ENGAGE'
+                    };
+                    return flags.slice(0, 2).map(f => flagMap[f] || f.toUpperCase()).join(', ');
+                },
+
+                getBehavioralRecommendations() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.behavioral_analysis;
+                    const recommendations = engine?.recommendations || [];
+                    if (recommendations.length === 0) return 'None';
+                    return recommendations[0].substring(0, 30) + '...';
+                },
+
+                getBrandImpersonation() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.visual_detection;
+                    return engine?.brand_impersonation || 'None';
+                },
+
+                getVisualSpoofing() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.visual_detection;
+                    return engine?.visual_spoofing_detected ? 'Detected' : 'None';
+                },
+
+                getURLManipulation() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.url_truncation;
+                    return engine?.manipulation_detected ? 'Detected' : 'None';
+                },
+
+                getWBLSource() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.whitelist_blacklist;
+                    return engine?.list_source || 'None';
+                },
+
+                getKnownFP() {
+                    const engine = this.result?.analysis?.comprehensive_analysis?.analysis_engines?.false_positive;
+                    return engine?.known_false_positive ? 'Yes' : 'No';
+                },
+
+                getModelDisplayName(name) {
+                    const names = {
+                        'phishing_model': '🎯 MEGA PHISHING',
+                        'cybersecurity_model': '🔒 CYBERSECURITY',
+                        'phishing_urls_model': '🔍 ADVANCED URL',
+                        'website_model': '🌐 WEBSITE ANALYZER',
+                        'crypto_scam_model': '₿ CRYPTO THREAT',
+                        'link_phishing_model': '🔗 LINK SCANNER',
+                        'malicious_urls_model': '🚨 MALICIOUS DETECTOR',
+                    };
+                    return names[name] || name.replace('_', ' ').toUpperCase();
+                },
+
+                async submitFeedback(type) {
+                    await sounds.feedback();
+                    
+                    // Visual feedback effect
+                    const color = type === 'correct' ? '#00ff41' : '#ff073a';
+                    document.body.style.filter = `drop-shadow(0 0 20px ${color})`;
+                    
+                    setTimeout(() => {
+                        document.body.style.filter = '';
+                    }, 500);
+                    
+                    // Send feedback to server
+                    try {
+                        await fetch('/feedback', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                url: this.targetUrl,
+                                feedback: type,
+                                prediction: this.result.prediction,
+                                confidence: this.result.confidence,
+                                timestamp: new Date().toISOString()
+                            })
+                        });
+                    } catch (err) {
+                        console.warn('Feedback submission failed:', err);
+                    }
+                },
+
+                // ANALYSIS PROCESS FUNCTIONS
+                processAnalysisLog(analysisLog) {
+                    console.log('🔍 Processing analysis log:', analysisLog);
+                    
+                    // Extract and set analysis steps
+                    this.analysisSteps = analysisLog.analysis_steps || [];
+                    
+                    // Sort by step number
+                    this.analysisSteps.sort((a, b) => a.step_number - b.step_number);
+                    
+                    console.log(`📋 Loaded ${this.analysisSteps.length} analysis steps`);
+                },
+
+                // REAL-TIME ANALYSIS STREAMING
+                startAnalysisStream(sessionId) {
+                    console.log('📡 Starting analysis stream for session:', sessionId);
+                    
+                    if (this.eventSource) {
+                        this.eventSource.close();
+                    }
+                    
+                    // Reset analysis steps for real-time updates
+                    this.analysisSteps = [];
+                    this.showAnalysisProcess = true;
+                    this.showAnalysisSteps = true;
+                    
+                    // Connect to SSE stream
+                    this.eventSource = new EventSource(`/analysis/stream/${sessionId}`);
+                    
+                    this.eventSource.onmessage = (event) => {
+                        try {
+                            const data = JSON.parse(event.data);
+                            console.log('📨 Stream data:', data);
+                            
+                            if (data.status === 'connected') {
+                                console.log('✅ Stream connected');
+                                
+                                // Add initial step
+                                this.analysisSteps = [{
+                                    step_number: 0,
+                                    phase_name: 'Bağlantı',
+                                    step_name: 'Analiz Stream Başlatıldı',
+                                    status: 'completed',
+                                    timestamp: new Date().toISOString(),
+                                    duration_ms: 0,
+                                    details: { message: '📡 Gerçek zamanlı analiz izleme başlatıldı' }
+                                }];
+                                
+                            } else if (data.status === 'completed') {
+                                console.log('🏁 Analysis stream completed');
+                                this.eventSource.close();
+                                
+                                // Mark last step as completed
+                                if (this.analysisSteps.length > 0) {
+                                    this.analysisSteps[this.analysisSteps.length - 1].status = 'completed';
+                                }
+                                
+                            } else if (data.step_number !== undefined) {
+                                // Analysis step update
+                                const existingStepIndex = this.analysisSteps.findIndex(s => s.step_number === data.step_number);
+                                
+                                if (existingStepIndex >= 0) {
+                                    // Update existing step
+                                    this.analysisSteps[existingStepIndex] = data;
+                                } else {
+                                    // Add new step
+                                    this.analysisSteps.push(data);
+                                    this.analysisSteps.sort((a, b) => a.step_number - b.step_number);
+                                }
+                            }
+                            
+                        } catch (err) {
+                            console.error('❌ Error parsing stream data:', err);
+                        }
+                    };
+                    
+                    this.eventSource.onerror = (error) => {
+                        console.error('❌ Stream error:', error);
+                        this.eventSource.close();
+                    };
+                },
+
+                stopAnalysisStream() {
+                    if (this.eventSource) {
+                        console.log('⏹️ Stopping analysis stream');
+                        this.eventSource.close();
+                        this.eventSource = null;
+                    }
+                },
+
+                getStepIcon(status) {
+                    const iconMap = {
+                        'started': '🔄',
+                        'processing': '⚙️', 
+                        'completed': '✅',
+                        'error': '❌',
+                        'warning': '⚠️'
+                    };
+                    return iconMap[status] || '📝';
+                },
+
+                formatTimestamp(timestamp) {
+                    if (!timestamp) return '';
+                    const date = new Date(timestamp);
+                    return date.toLocaleTimeString('tr-TR', { 
+                        hour12: false,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        fractionalSecondDigits: 3
+                    });
+                }
+            }
+        }
+
+        // Window resize handler for matrix
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('matrix-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html> 
