@@ -359,14 +359,14 @@
                         <h4 class="font-bold text-blue-800 flex items-center">
                             <i class="fas fa-cogs mr-2"></i> Paralel Analiz Motorları
                         </h4>
-                        <p class="mt-2 text-sm">Sistemin kalbini oluşturan ve bir URL'yi eş zamanlı olarak farklı vektörlerden inceleyen 9 bağımsız motor.</p>
+                        <p class="mt-2 text-sm">Sistemin kalbini oluşturan ve bir URL'yi eş zamanlı olarak farklı vektörlerden inceleyen 9 bağımsız motor. Bu paralelleştirme, analiz süresini önemli ölçüde kısaltır.</p>
                     </div>
                     
                     <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
                         <h4 class="font-bold text-blue-800 flex items-center">
                             <i class="fas fa-balance-scale mr-2"></i> Karar ve Skorlama Mekanizması
                         </h4>
-                        <p class="mt-2 text-sm">Tüm motorlardan gelen risk skorlarını, önceden tanımlanmış ağırlıklara göre birleştirir ve nihai kararı verir.</p>
+                        <p class="mt-2 text-sm">Tüm motorlardan gelen risk skorlarını, önceden tanımlanmış ağırlıklara göre birleştirir. Toplam risk skorunu hesaplar ve bu skora göre nihai <code>SAFE</code>, <code>SUSPICIOUS</code> veya <code>PHISHING</code> kararını verir.</p>
                     </div>
                 </div>
             </div>
@@ -820,6 +820,91 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <hr>
+        
+        <section id="engine-details">
+            <h2>5. Analiz Motorlarının Detaylı Çalışma Prensibi</h2>
+            <p>Sistemin kalbini oluşturan 9 analiz motoru, bir URL'yi farklı uzmanlık alanlarına göre inceler. İşte her bir motorun çalışma prensibi:</p>
+
+            <div class="engine">
+                <h3>1. 🤖 ML Ensemble (Makine Öğrenmesi Topluluğu)</h3>
+                <p><strong>Amacı:</strong> URL'nin yapısal ve metinsel özelliklerinden yola çıkarak istatistiksel bir tehlike tahmini yapmak.</p>
+                <p><strong>Nasıl Çalışır?</strong> Bir URL'den 30'dan fazla özellik (URL uzunluğu, özel karakter sayısı, alan adı yaşı, anlamsız kelimeler vb.) çıkarır. Bu özellikleri, farklı algoritmalara (Random Forest, CatBoost, Gradient Boosting vb.) sahip 7 farklı makine öğrenmesi modeline besler. Her model bağımsız bir "Güvenli" veya "Phishing" oyu verir. Sonuç, oy çokluğuna göre belirlenir. Bu çeşitlilik, tek bir modelin yanılma payını en aza indirir.</p>
+            </div>
+
+            <div class="engine">
+                <h3>2. 🌐 Threat Intelligence (Tehdit İstihbaratı)</h3>
+                <p><strong>Amacı:</strong> URL'nin global siber güvenlik veritabanlarındaki itibarını sorgulamak.</p>
+                <p><strong>Nasıl Çalışır?</strong> <strong>Google Safe Browsing</strong> ve <strong>VirusTotal</strong> gibi dünyaca ünlü tehdit istihbaratı servislerinin API'larına bağlanır. URL'nin bu platformlarda daha önce "tehlikeli" olarak etiketlenip etiketlenmediğini kontrol eder. Bu, bilinen tehditleri anında yakalamanın en hızlı yoludur.</p>
+            </div>
+
+            <div class="engine">
+                <h3>3. 🔒 Network Security (Ağ Güvenliği Analizi)</h3>
+                <p><strong>Amacı:</strong> Alan adının ağ altyapısının güvenilirliğini ve teknik konfigürasyonunu analiz etmek.</p>
+                <p><strong>Nasıl Çalışır?</strong></p>
+                <ul>
+                    <li><strong>SSL/TLS Analizi:</strong> Sitenin SSL sertifikasının geçerliliğini, sertifika sağlayıcısını (örneğin, güvenilir bir otorite mi yoksa kendinden imzalı mı?) ve son kullanma tarihini inceler. Phishing siteleri genellikle geçersiz, yeni veya şüpheli sertifikalar kullanır.</li>
+                    <li><strong>DNS Kayıtları:</strong> Alan adının DNS kayıtlarını (A, MX, SPF, DMARC) analiz eder. Özellikle e-posta sahtekarlığını önleyen SPF ve DMARC kayıtlarının varlığı ve doğruluğu, alan adının güvenilirliği hakkında önemli ipuçları verir.</li>
+                    <li><strong>Alan Adı Yaşı (Domain Age):</strong> Alan adının ne zaman kaydedildiğini kontrol eder. Çok yeni (birkaç günden az) alan adları genellikle phishing saldırıları için kurulduğundan şüpheli kabul edilir.</li>
+                </ul>
+            </div>
+
+            <div class="engine">
+                <h3>4. 📄 Content Security (İçerik Güvenlik Analizi)</h3>
+                <p><strong>Amacı:</strong> Web sayfasının kaynak kodunu (HTML, JavaScript) inceleyerek gizlenmiş tehditleri ve aldatmacaları ortaya çıkarmak.</p>
+                <p><strong>Nasıl Çalışır?</strong> Sayfanın HTML içeriğini indirir ve analiz eder.</p>
+                <ul>
+                    <li><strong>JavaScript Taraması:</strong> Tehlikeli veya şüpheli JavaScript fonksiyonlarını (örneğin, kullanıcı girdilerini çalan kodlar, tarayıcıyı manipüle eden script'ler) arar. Ayrıca, sitenin bir İçerik Güvenlik Politikası (CSP) olup olmadığını kontrol eder.</li>
+                    <li><strong>Form Analizi:</strong> Sayfadaki giriş formlarını (<code>&lt;form&gt;</code>) bulur. Formun gönderildiği adresin, mevcut sitenin alan adıyla aynı olup olmadığını kontrol eder. Farklı bir adrese veri gönderen formlar, klasik bir phishing tekniğidir.</li>
+                    <li><strong>Gizli veya Şüpheli Linkler:</strong> Sayfadaki linklerin (hyperlink) nereye gittiğini ve görünür metin ile gerçek hedefin tutarlı olup olmadığını analiz eder.</li>
+                </ul>
+            </div>
+
+            <div class="engine">
+                <h3>5. 👤 Behavioral Analysis (Davranışsal Analiz)</h3>
+                <p><strong>Amacı:</strong> Bir web sitesinin, normal bir kullanıcıya davrandığından farklı olarak otomatik sistemlere (bot'lara) karşı farklı davranıp davranmadığını tespit etmek.</p>
+                <p><strong>Nasıl Çalışır?</strong> Arka planda <strong>Selenium</strong> gibi bir araçla sanal bir tarayıcı çalıştırır.</p>
+                <ul>
+                    <li><strong>Yönlendirme Zincirleri (Redirection Chains):</strong> URL'nin birden fazla kez başka sayfalara yönlendirilip yönlendirilmediğini takip eder. Saldırganlar bu tekniği, nihai kötü amaçlı sayfayı gizlemek için kullanır.</li>
+                    <li><strong>Saat Farkı (Cloaking) Tespiti:</strong> Sayfanın, analiz botlarına farklı, gerçek kullanıcılara farklı içerik gösterip göstermediğini anlamaya çalışır.</li>
+                </ul>
+            </div>
+
+            <div class="engine">
+                <h3>6. 👁️ Visual Detection (Görsel Tespit)</h3>
+                <p><strong>Amacı:</strong> Popüler markaların (banka, sosyal medya, e-ticaret) giriş sayfalarını görsel olarak taklit eden siteleri yakalamak.</p>
+                <p><strong>Nasıl Çalışır?</strong></p>
+                <ul>
+                    <li><strong>Ekran Görüntüsü Alma:</strong> Web sayfasının tam bir ekran görüntüsünü alır.</li>
+                    <li><strong>Logo Tespiti:</strong> Görüntü işleme teknikleri kullanarak ekran görüntüsünde bilinen markalara ait logoların olup olmadığını arar.</li>
+                    <li><strong>Yapısal Benzerlik:</strong> Sayfanın görsel şablonunu (renk paleti, düzen), bilinen popüler sitelerin giriş sayfalarıyla karşılaştırır. Piksel piksel aynısı olan tasarımlar yüksek risk olarak işaretlenir.</li>
+                </ul>
+            </div>
+
+            <div class="engine">
+                <h3>7. 🔗 URL Truncation (URL Manipülasyon Analizi)</h3>
+                <p><strong>Amacı:</strong> Kullanıcıyı yanıltmak için URL metninde yapılan aldatmacaları ve gizleme tekniklerini tespit etmek.</p>
+                <p><strong>Nasıl Çalışır?</strong> Sadece URL metnini inceler.</p>
+                <ul>
+                    <li><strong>Marka Adı Kaçakçılığı:</strong> URL içinde alakasız bir yerde (<code>google.com.login.shady-site.com</code> gibi) bilinen bir marka adının geçip geçmediğini kontrol eder.</li>
+                    <li><strong>Yazım Hataları (Typosquatting):</strong> Popüler alan adlarının kasıtlı olarak yanlış yazılmış versiyonlarını (<code>gogle.com</code>, <code>microsfot.com</code> gibi) arar.</li>
+                    <li><strong>Uluslararası Karakterler (IDN Homograph):</strong> Latin alfabesindeki harflere çok benzeyen Kiril veya Yunan alfabesi karakterlerinin (<code>аррӏе.com</code> gibi) kullanılıp kullanılmadığını tespit eder.</li>
+                </ul>
+            </div>
+
+            <div class="engine">
+                <h3>8. 📋 Whitelist/Blacklist (Güvenli/Tehlikeli Liste)</h3>
+                <p><strong>Amacı:</strong> Analiz sürecini hızlandırmak için ilk ve en hızlı savunma hattını oluşturmak.</p>
+                <p><strong>Nasıl Çalışır?</strong> Gelen URL'nin alan adını, sistemde önceden tanımlanmış olan "kesin güvenli" (whitelist) ve "kesin tehlikeli" (blacklist) listeleriyle karşılaştırır. Eğer bir eşleşme varsa, diğer 8 motor hiç çalıştırılmaz ve karar anında verilir. Bu, sisteme muazzam bir performans kazandırır.</p>
+            </div>
+
+            <div class="engine">
+                <h3>9. ✅ False Positive (Yanlış Pozitif Kontrolü)</h3>
+                <p><strong>Amacı:</strong> Diğer motorlar tarafından "riskli" olarak bulunabilecek, ancak aslında güvenli olduğu bilinen istisnai durumları yönetmek.</p>
+                <p><strong>Nasıl Çalışır?</strong> Bu, sistemin son kontrol mekanizmasıdır. Bir URL, diğer tüm motorlardan geçip "Phishing" kararı alsa bile, son olarak bu listeye bakılır. Eğer URL, daha önce bir sistem yöneticisi tarafından "bu bir yanlış alarmdır" diye işaretlenmişse, nihai karar "Güvenli" olarak düzeltilir. Bu, sistemin zamanla kendi hatalarından öğrenmesini sağlar.</p>
             </div>
         </section>
     </main>

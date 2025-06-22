@@ -62,6 +62,62 @@ Sistem, modüler ve ölçeklenebilir bir yapıda, **FastAPI** üzerine kurulu bi
 
 ---
 
+## 5. Analiz Motorlarının Detaylı Çalışma Prensibi
+
+Sistemin kalbini oluşturan 9 analiz motoru, bir URL'yi farklı uzmanlık alanlarına göre inceler. İşte her bir motorun çalışma prensibi:
+
+### 1. 🤖 ML Ensemble (Makine Öğrenmesi Topluluğu)
+- **Amacı:** URL'nin yapısal ve metinsel özelliklerinden yola çıkarak istatistiksel bir tehlike tahmini yapmak.
+- **Nasıl Çalışır?** Bir URL'den 30'dan fazla özellik (URL uzunluğu, özel karakter sayısı, alan adı yaşı, anlamsız kelimeler vb.) çıkarır. Bu özellikleri, farklı algoritmalara (Random Forest, CatBoost, Gradient Boosting vb.) sahip 7 farklı makine öğrenmesi modeline besler. Her model bağımsız bir "Güvenli" veya "Phishing" oyu verir. Sonuç, oy çokluğuna göre belirlenir. Bu çeşitlilik, tek bir modelin yanılma payını en aza indirir.
+
+### 2. 🌐 Threat Intelligence (Tehdit İstihbaratı)
+- **Amacı:** URL'nin global siber güvenlik veritabanlarındaki itibarını sorgulamak.
+- **Nasıl Çalışır?** **Google Safe Browsing** ve **VirusTotal** gibi dünyaca ünlü tehdit istihbaratı servislerinin API'larına bağlanır. URL'nin bu platformlarda daha önce "tehlikeli" olarak etiketlenip etiketlenmediğini kontrol eder. Bu, bilinen tehditleri anında yakalamanın en hızlı yoludur.
+
+### 3. 🔒 Network Security (Ağ Güvenliği Analizi)
+- **Amacı:** Alan adının ağ altyapısının güvenilirliğini ve teknik konfigürasyonunu analiz etmek.
+- **Nasıl Çalışır?**
+    - **SSL/TLS Analizi:** Sitenin SSL sertifikasının geçerliliğini, sertifika sağlayıcısını (örneğin, güvenilir bir otorite mi yoksa kendinden imzalı mı?) ve son kullanma tarihini inceler. Phishing siteleri genellikle geçersiz, yeni veya şüpheli sertifikalar kullanır.
+    - **DNS Kayıtları:** Alan adının DNS kayıtlarını (A, MX, SPF, DMARC) analiz eder. Özellikle e-posta sahtekarlığını önleyen SPF ve DMARC kayıtlarının varlığı ve doğruluğu, alan adının güvenilirliği hakkında önemli ipuçları verir.
+    - **Alan Adı Yaşı (Domain Age):** Alan adının ne zaman kaydedildiğini kontrol eder. Çok yeni (birkaç günden az) alan adları genellikle phishing saldırıları için kurulduğundan şüpheli kabul edilir.
+
+### 4. 📄 Content Security (İçerik Güvenlik Analizi)
+- **Amacı:** Web sayfasının kaynak kodunu (HTML, JavaScript) inceleyerek gizlenmiş tehditleri ve aldatmacaları ortaya çıkarmak.
+- **Nasıl Çalışır?** Sayfanın HTML içeriğini indirir ve analiz eder.
+    - **JavaScript Taraması:** Tehlikeli veya şüpheli JavaScript fonksiyonlarını (örneğin, kullanıcı girdilerini çalan kodlar, tarayıcıyı manipüle eden script'ler) arar. Ayrıca, sitenin bir İçerik Güvenlik Politikası (CSP) olup olmadığını kontrol eder.
+    - **Form Analizi:** Sayfadaki giriş formlarını (`<form>`) bulur. Formun gönderildiği adresin, mevcut sitenin alan adıyla aynı olup olmadığını kontrol eder. Farklı bir adrese veri gönderen formlar, klasik bir phishing tekniğidir.
+    - **Gizli veya Şüpheli Linkler:** Sayfadaki linklerin (hyperlink) nereye gittiğini ve görünür metin ile gerçek hedefin tutarlı olup olmadığını analiz eder.
+
+### 5. 👤 Behavioral Analysis (Davranışsal Analiz)
+- **Amacı:** Bir web sitesinin, normal bir kullanıcıya davrandığından farklı olarak otomatik sistemlere (bot'lara) karşı farklı davranıp davranmadığını tespit etmek.
+- **Nasıl Çalışır?** Arka planda **Selenium** gibi bir araçla sanal bir tarayıcı çalıştırır.
+    - **Yönlendirme Zincirleri (Redirection Chains):** URL'nin birden fazla kez başka sayfalara yönlendirilip yönlendirilmediğini takip eder. Saldırganlar bu tekniği, nihai kötü amaçlı sayfayı gizlemek için kullanır.
+    - **Saat Farkı (Cloaking) Tespiti:** Sayfanın, analiz botlarına farklı, gerçek kullanıcılara farklı içerik gösterip göstermediğini anlamaya çalışır.
+
+### 6. 👁️ Visual Detection (Görsel Tespit)
+- **Amacı:** Popüler markaların (banka, sosyal medya, e-ticaret) giriş sayfalarını görsel olarak taklit eden siteleri yakalamak.
+- **Nasıl Çalışır?**
+    - **Ekran Görüntüsü Alma:** Web sayfasının tam bir ekran görüntüsünü alır.
+    - **Logo Tespiti:** Görüntü işleme teknikleri kullanarak ekran görüntüsünde bilinen markalara ait logoların olup olmadığını arar.
+    - **Yapısal Benzerlik:** Sayfanın görsel şablonunu (renk paleti, düzen), bilinen popüler sitelerin giriş sayfalarıyla karşılaştırır. Piksel piksel aynısı olan tasarımlar yüksek risk olarak işaretlenir.
+
+### 7. 🔗 URL Truncation (URL Manipülasyon Analizi)
+- **Amacı:** Kullanıcıyı yanıltmak için URL metninde yapılan aldatmacaları ve gizleme tekniklerini tespit etmek.
+- **Nasıl Çalışır?** Sadece URL metnini inceler.
+    - **Marka Adı Kaçakçılığı:** URL içinde alakasız bir yerde (`google.com.login.shady-site.com` gibi) bilinen bir marka adının geçip geçmediğini kontrol eder.
+    - **Yazım Hataları (Typosquatting):** Popüler alan adlarının kasıtlı olarak yanlış yazılmış versiyonlarını (`gogle.com`, `microsfot.com` gibi) arar.
+    - **Uluslararası Karakterler (IDN Homograph):** Latin alfabesindeki harflere çok benzeyen Kiril veya Yunan alfabesi karakterlerinin (`аррӏе.com` gibi) kullanılıp kullanılmadığını tespit eder.
+
+### 8. 📋 Whitelist/Blacklist (Güvenli/Tehlikeli Liste)
+- **Amacı:** Analiz sürecini hızlandırmak için ilk ve en hızlı savunma hattını oluşturmak.
+- **Nasıl Çalışır?** Gelen URL'nin alan adını, sistemde önceden tanımlanmış olan "kesin güvenli" (whitelist) ve "kesin tehlikeli" (blacklist) listeleriyle karşılaştırır. Eğer bir eşleşme varsa, diğer 8 motor hiç çalıştırılmaz ve karar anında verilir. Bu, sisteme muazzam bir performans kazandırır.
+
+### 9. ✅ False Positive (Yanlış Pozitif Kontrolü)
+- **Amacı:** Diğer motorlar tarafından "riskli" olarak bulunabilecek, ancak aslında güvenli olduğu bilinen istisnai durumları yönetmek.
+- **Nasıl Çalışır?** Bu, sistemin son kontrol mekanizmasıdır. Bir URL, diğer tüm motorlardan geçip "Phishing" kararı alsa bile, son olarak bu listeye bakılır. Eğer URL, daha önce bir sistem yöneticisi tarafından "bu bir yanlış alarmdır" diye işaretlenmişse, nihai karar "Güvenli" olarak düzeltilir. Bu, sistemin zamanla kendi hatalarından öğrenmesini sağlar.
+
+---
+
 ## 5. Çalışma Mantığı ve Analiz Akışı
 
 Bir URL sisteme girdiğinde, aşağıdaki adımlardan geçer:
