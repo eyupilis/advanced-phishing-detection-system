@@ -1826,42 +1826,41 @@ async def advanced_analyze_url(request: AdvancedURLRequest):
         url = request.url.strip()
         if not url.startswith(('http://', 'https://')):
             url = 'http://' + url
-        
+
         logger.info(f"🚀 ADVANCED ANALYSIS başlıyor: {url}")
-        
+
         # Use Enhanced Ensemble Analyzer for comprehensive analysis
         from enhanced_ensemble_analyzer import enhanced_ensemble_analyzer
-        
+
         comprehensive_result = await enhanced_ensemble_analyzer.comprehensive_analyze(
             url=url,
             session_id=session_id,
             user_agent=request.user_agent or 'ADVANCED_API_CLIENT',
             deep_scan=request.deep_scan
         )
-        
-        # Extract data from comprehensive analysis
+
         if 'error' not in comprehensive_result:
             # Get ML ensemble results
             ml_engine = comprehensive_result.get('analysis_engines', {}).get('ml_ensemble', {})
-            
+
             # Get individual engine results
             behavioral_analysis = comprehensive_result.get('analysis_engines', {}).get('behavioral_analysis', {})
             content_analysis = comprehensive_result.get('analysis_engines', {}).get('content_security', {})
             visual_analysis = comprehensive_result.get('analysis_engines', {}).get('visual_detection', {})
             network_analysis = comprehensive_result.get('analysis_engines', {}).get('network_analysis', {})
             threat_intelligence = comprehensive_result.get('analysis_engines', {}).get('external_threat_intel', {})
-            
+
             final_prediction = comprehensive_result.get('final_decision', 'unknown').lower()
             final_confidence = comprehensive_result.get('final_confidence', 0.0)
             final_risk_score = comprehensive_result.get('final_risk_score', 0.0)
-        
+
             # Threat level hesapla
             threat_level = get_threat_level(
-                final_confidence, 
+                final_confidence,
                 final_risk_score,
                 len([t for t in [threat_intelligence] if t and t.get('is_threat', False)])
             )
-            
+
             # Get ensemble analysis for backward compatibility
             ensemble_analysis = {
                 "ensemble_prediction": ml_engine.get('ensemble_prediction', 'Unknown'),
@@ -1875,14 +1874,14 @@ async def advanced_analyze_url(request: AdvancedURLRequest):
                 "individual_models": ml_engine.get('individual_models', {}),
                 "comprehensive_analysis": comprehensive_result
             }
-            
+
             # Get features from ML engine or fallback
             features = ml_engine.get('features', {})
             if not features:
                 # Fallback to feature extraction
                 feature_extractor = FeatureExtractor()
                 features = feature_extractor.extract_features(url)
-            
+
             # Get recommendations
             recommendations = comprehensive_result.get('recommendations', [])
             if not recommendations:
@@ -1896,12 +1895,12 @@ async def advanced_analyze_url(request: AdvancedURLRequest):
             logger.warning("⚠️ Comprehensive analysis failed, falling back to basic analysis")
             from ensemble_phishing_detector import api_analyze_url_7_models
             ensemble_result = api_analyze_url_7_models(url)
-            
+
             final_prediction = ensemble_result.get('final_label', 'unknown').lower()
             final_confidence = ensemble_result.get('confidence', 0.0)
             final_risk_score = ensemble_result.get('confidence', 0.0)
             threat_level = get_threat_level(final_confidence, final_risk_score)
-            
+
             ensemble_analysis = ensemble_result
             features = ensemble_result.get('features', {})
             recommendations = generate_recommendations({
@@ -1909,17 +1908,17 @@ async def advanced_analyze_url(request: AdvancedURLRequest):
                 'confidence': final_confidence,
                 'risk_score': final_risk_score
             })
-            
+
             # Set empty analysis for individual engines
             behavioral_analysis = None
             content_analysis = None
             visual_analysis = None
             network_analysis = None
             threat_intelligence = None
-        
+
         end_time = datetime.now()
         analysis_duration = (end_time - start_time).total_seconds() * 1000
-        
+
         return AdvancedPredictionResponse(
             url=url,
             prediction=final_prediction,
@@ -1939,7 +1938,6 @@ async def advanced_analyze_url(request: AdvancedURLRequest):
             analysis_duration_ms=round(analysis_duration, 2),
             session_id=session_id
         )
-        
     except Exception as e:
         logger.error(f"Advanced analysis error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -2386,12 +2384,12 @@ async def get_threat_monitoring_status():
             from real_time_threat_monitor import RealTimeThreatMonitor
             temp_monitor = RealTimeThreatMonitor()
             monitoring_status = temp_monitor.get_metrics()
-        
-        return {
-            "status": "success",
-            "timestamp": datetime.now().isoformat(),
-            "threat_monitoring": monitoring_status
-        }
+            
+            return {
+                "status": "success",
+                "timestamp": datetime.now().isoformat(),
+                "threat_monitoring": monitoring_status
+            }
         
     except Exception as e:
         logger.error(f"❌ Threat monitoring status error: {e}")

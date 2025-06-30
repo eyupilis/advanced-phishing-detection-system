@@ -480,17 +480,15 @@ class EnsemblePhishingDetector:
                         # Pipeline'ın create_features metodunu kullan
                         features_df = pipeline.create_features(temp_df)
                         features_array = features_df.values
-                        
+                    
                         # Scaler uygula
                         if 'scaler' in self.model_info[model_name]:
                             scaler = self.model_info[model_name]['scaler']
                             features_array = scaler.transform(features_array)
-                        
                         # Feature selector uygula
                         if 'feature_selector' in self.model_info[model_name]:
                             feature_selector = self.model_info[model_name]['feature_selector']
                             features_array = feature_selector.transform(features_array)
-                        
                         return features_array
                     else:
                         # Pipeline yoksa fallback
@@ -539,11 +537,9 @@ class EnsemblePhishingDetector:
                     if 'scaler' in self.model_info.get(model_name, {}):
                         scaler = self.model_info[model_name]['scaler']
                         features = scaler.transform(features)
-                    
                     if 'feature_selector' in self.model_info.get(model_name, {}):
                         feature_selector = self.model_info[model_name]['feature_selector']
                         features = feature_selector.transform(features)
-                    
                     return features
                         
                 except Exception as sub_e:

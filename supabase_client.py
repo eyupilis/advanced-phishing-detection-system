@@ -31,7 +31,7 @@ class SupabaseClient:
                 return {"status": "success", "data": []}
             else:
                 return {"status": "success"}
-                
+            
         except Exception as e:
             logger.debug(f"📊 Supabase test mode error (ignored): {e}")
             return {"status": "success"}  # Test mode'da hataları ignore et

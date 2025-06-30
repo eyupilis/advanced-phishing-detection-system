@@ -490,3 +490,4 @@ class RealBehavioralAnalyzer:
 
 # Global instance
 real_behavioral_analyzer = RealBehavioralAnalyzer()
+ 

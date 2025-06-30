@@ -74,7 +74,7 @@ class EnhancedEnsembleAnalyzer:
         
         # Analysis results cache
         self.analysis_cache = {}
-        
+    
     async def comprehensive_analyze(self, url: str, session_id: Optional[str] = None,
                                   user_agent: Optional[str] = None,
                                   deep_scan: bool = False) -> Dict:
@@ -543,10 +543,10 @@ class EnhancedEnsembleAnalyzer:
                 elif 'compatible' not in user_agent.lower() and 'mozilla' in user_agent.lower():
                     automation_score += 0.1
                     behavioral_flags.append('unusual_user_agent')
-            else:
-                # No user agent provided
-                automation_score = 0.4
-                behavioral_flags.append('missing_user_agent')
+                else:
+                    # No user agent provided
+                    automation_score = 0.4
+                    behavioral_flags.append('missing_user_agent')
             
             # 2. URL Pattern Analysis for Behavioral Insights
             suspicious_patterns = [
@@ -964,7 +964,7 @@ class EnhancedEnsembleAnalyzer:
                 'low_risk_engines': [name for name, scores in weighted_scores.items() if scores['raw_score'] < 0.3]
             }
         }
-
+    
     def _generate_network_security_explanation(self, network_result: Dict) -> Dict:
         """Network security analizi için açıklama oluştur"""
         try:
@@ -1011,7 +1011,7 @@ class EnhancedEnsembleAnalyzer:
                 explanation['confidence_factors'].append(f"Güvenilir CA tarafından imzalanmış: {issuer_cn}")
             elif 'untrusted_ca' in ssl_flags:
                 explanation['risk_factors'].append("Güvenilmeyen Certificate Authority")
-            
+                
             # Certificate expiry
             if 'certificate_expired' in ssl_flags:
                 explanation['risk_factors'].append("SSL sertifikası süresi dolmuş")
